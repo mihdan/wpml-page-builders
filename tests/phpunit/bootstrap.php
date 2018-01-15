@@ -32,13 +32,7 @@ define( 'WP_CONTENT_DIR', realpath( __DIR__ . '/../../../../' ) );
 define( 'WP_CONTENT_URL', WPML_ST_SITE_URL . '/wp-content' );
 define( 'WP_PLUGIN_URL', WPML_ST_SITE_URL . '/' . WP_CONTENT_URL . '/plugins' );
 
-$autoloader_dir = WPML_ST_PATH . '/vendor';
-if ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) {
-	$autoloader = $autoloader_dir . '/autoload.php';
-} else {
-	$autoloader = $autoloader_dir . '/autoload_52.php';
-}
-require_once $autoloader;
+require_once '../../vendor/autoload.php';
 
 require_once WPML_ST_PATH . '/vendor/otgs/unit-tests-framework/phpunit/bootstrap.php';
 
