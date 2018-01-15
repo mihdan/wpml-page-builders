@@ -1,0 +1,72 @@
+<?php
+
+class Test_WPML_PB_Factory extends WPML_PB_TestCase {
+
+	private $wpdb_original;
+
+	function setUp() {
+		parent::setUp();
+		global $wpdb;
+
+		$this->mock_all_core_functions();
+
+		$this->wpdb_original = $wpdb;
+	}
+
+	function tearDown() {
+		parent::tearDown();
+
+		global $wpdb;
+		$wpdb = $this->wpdb_original;
+
+	}
+
+	/**
+	 * @test
+	 */
+	public function test_get_string_translations() {
+		$factory            = $this->get_factory_with_mocks();
+		$string_translation = $factory->get_string_translations( $this->get_shortcode_strategy( $factory ) );
+		$this->assertInstanceOf( 'WPML_PB_String_Translation', $string_translation );
+	}
+
+	/**
+	 * @test
+	 */
+	public function test_get_register_shortcodes() {
+		$factory             = $this->get_factory_with_mocks();
+
+		$register_shortcodes = $factory->get_register_shortcodes( $this->get_shortcode_strategy( $factory ) );
+		$this->assertInstanceOf( 'WPML_PB_Register_Shortcodes', $register_shortcodes );
+	}
+
+	/**
+	 * @test
+	 */
+	public function test_get_wpml_package() {
+		$factory = $this->get_factory_with_mocks();
+		$package = $factory->get_wpml_package( 1 );
+		$this->assertInstanceOf( 'WPML_Package', $package );
+	}
+
+	private function get_factory_with_mocks() {
+		global $wpdb;
+
+		$sitepress_mock = $this->get_sitepress_mock();
+		$wpdb           = $this->stubs->wpdb();
+		$factory        = $this->get_factory( $wpdb, $sitepress_mock );
+
+		return $factory;
+	}
+
+	private function get_sitepress_mock() {
+		$sitepress_mock = $this->getMockBuilder( 'SitePress' )
+		                       ->setMethods( array( 'get_active_languages' ) )
+		                       ->disableOriginalConstructor()
+		                       ->getMock();
+
+		$sitepress_mock->method( 'get_active_languages' )->willReturn( array() );
+		return $sitepress_mock;
+	}
+
+}
