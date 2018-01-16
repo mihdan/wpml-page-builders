@@ -32,10 +32,9 @@ define( 'WP_CONTENT_DIR', realpath( __DIR__ . '/../../../../' ) );
 define( 'WP_CONTENT_URL', WPML_ST_SITE_URL . '/wp-content' );
 define( 'WP_PLUGIN_URL', WPML_ST_SITE_URL . '/' . WP_CONTENT_URL . '/plugins' );
 
-require_once '../../vendor/autoload.php';
-
-require_once WPML_ST_PATH . '/vendor/otgs/unit-tests-framework/phpunit/bootstrap.php';
-
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', realpath(WPML_ST_PATH . '/../../../') );
 }
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/otgs/unit-tests-framework/phpunit/bootstrap.php';
