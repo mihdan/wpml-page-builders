@@ -2,7 +2,7 @@
   "name": "wpml/page-builders",
   "description": "A library used by WPML to handle page builders plugins and themes",
   "type": "library",
-  "license": "GPL-3.0+",
+  "license": "GPL-3.0-or-later",
   "authors": [
     {
       "name": "OnTheGoSystems",
