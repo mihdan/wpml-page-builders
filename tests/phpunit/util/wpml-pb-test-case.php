@@ -95,7 +95,10 @@ abstract class WPML_PB_TestCase extends OTGS_TestCase {
 		}
 		$post_id = rand();
 
-		$post = new stdClass();
+		$post = $this->getMockBuilder( 'WP_Post' )
+			->disableOriginalConstructor()
+			->getMock();
+
 		$post->ID = $post_id;
 
 		$package = array(
