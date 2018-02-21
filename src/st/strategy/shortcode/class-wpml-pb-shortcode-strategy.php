@@ -12,9 +12,10 @@ class WPML_PB_Shortcode_Strategy implements IWPML_PB_Strategy {
 			$tag = $shortcode['tag']['value'];
 			if ( ! in_array( $tag, $this->shortcodes ) ) {
 				$this->shortcodes[ $tag ] = array(
-					'encoding' => $shortcode['tag']['encoding'],
-					'type' => isset( $shortcode['tag']['type'] ) ? $shortcode['tag']['type'] : '',
-					'attributes' => array(),
+					'encoding'           => $shortcode['tag']['encoding'],
+					'encoding-condition' => isset( $shortcode['tag']['encoding-condition'] ) ? $shortcode['tag']['encoding-condition'] : '',
+					'type'               => isset( $shortcode['tag']['type'] ) ? $shortcode['tag']['type'] : '',
+					'attributes'         => array(),
 				);
 			}
 			if ( isset( $shortcode['attributes'] ) ) {
@@ -35,6 +36,10 @@ class WPML_PB_Shortcode_Strategy implements IWPML_PB_Strategy {
 
 	public function get_shortcode_tag_encoding( $tag ) {
 		return $this->shortcodes[ $tag ]['encoding'];
+	}
+
+	public function get_shortcode_tag_encoding_condition( $tag ) {
+		return $this->shortcodes[ $tag ]['encoding-condition'];
 	}
 
 	public function get_shortcode_tag_type( $tag ) {

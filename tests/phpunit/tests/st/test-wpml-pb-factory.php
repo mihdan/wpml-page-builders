@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class Test_WPML_PB_Factory
+ *
+ * @group 123456
+ */
 class Test_WPML_PB_Factory extends WPML_PB_TestCase {
 
 	private $wpdb_original;

@@ -52,10 +52,11 @@ class WPML_PB_Register_Shortcodes {
 		}
 
 		foreach ( $shortcodes as $shortcode ) {
-			$shortcode_content = $shortcode['content'];
-			$encoding          = $this->shortcode_strategy->get_shortcode_tag_encoding( $shortcode['tag'] );
-			$type              = $this->shortcode_strategy->get_shortcode_tag_type( $shortcode['tag'] );
-			$shortcode_content = $this->encoding->decode( $shortcode_content, $encoding );
+			$shortcode_content  = $shortcode['content'];
+			$encoding           = $this->shortcode_strategy->get_shortcode_tag_encoding( $shortcode['tag'] );
+			$encoding_condition = $this->shortcode_strategy->get_shortcode_tag_encoding_condition( $shortcode['tag'] );
+			$type               = $this->shortcode_strategy->get_shortcode_tag_type( $shortcode['tag'] );
+			$shortcode_content  = $this->encoding->decode( $shortcode_content, $encoding, $encoding_condition );
 
 			$this->register_string( $post_id, $shortcode_content, $shortcode, 'content', $type );
 
