@@ -8,12 +8,16 @@ class WPML_PB_Shortcode_Encoding {
 	const ENCODE_TYPES_VISUAL_COMPOSER_LINK = 'vc_link';
 	const ENCODE_TYPES_ENFOLD_LINK          = 'av_link';
 
-	public function decode( $string, $encoding ) {
+	public function decode( $string, $encoding, $encoding_condition = '' ) {
 		$encoded_string = $string;
+
+		if ( $encoding_condition && ! $this->should_decode( $encoding_condition ) ) {
+			return html_entity_decode( $string );
+		}
 
 		switch ( $encoding ) {
 			case self::ENCODE_TYPES_BASE64:
-				$string = rawurldecode( base64_decode( strip_tags( $string ) ) );
+				$string = html_entity_decode( rawurldecode( base64_decode( strip_tags( $string ) ) ) );
 				break;
 
 			case self::ENCODE_TYPES_VISUAL_COMPOSER_LINK:
@@ -77,5 +81,16 @@ class WPML_PB_Shortcode_Encoding {
 		}
 
 		return apply_filters( 'wpml_pb_shortcode_encode', $string, $encoding, $decoded_string );
+	}
+
+	/**
+	 * @param string $condition
+	 *
+	 * @return bool
+	 */
+	private function should_decode( $condition ) {
+		preg_match( '/(?P<type>\w+):(?P<field>\w+)=(?P<value>\w+)/', $condition, $matches );
+
+		return 'option' === $matches['type'] && get_option( $matches['field'] ) === $matches['value'];
 	}
 }

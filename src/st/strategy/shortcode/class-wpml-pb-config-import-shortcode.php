@@ -62,9 +62,10 @@ class WPML_PB_Config_Import_Shortcode {
 				}
 				$shortcode_data[] = array(
 					'tag'        => array(
-						'value'    => $data['tag']['value'],
-						'encoding' => isset( $data['tag']['attr']['encoding'] ) ? $data['tag']['attr']['encoding'] : '',
-						'type'     => isset( $data['tag']['attr']['type'] ) ? $data['tag']['attr']['type'] : '',
+						'value'              => $data['tag']['value'],
+						'encoding'           => isset( $data['tag']['attr']['encoding'] ) ? $data['tag']['attr']['encoding'] : '',
+						'encoding-condition' => isset( $data['tag']['attr']['encoding-condition'] ) ? $data['tag']['attr']['encoding-condition'] : '',
+						'type'               => isset( $data['tag']['attr']['type'] ) ? $data['tag']['attr']['type'] : '',
 					),
 					'attributes' => $attributes,
 				);

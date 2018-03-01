@@ -4,6 +4,7 @@
  * Class Test_WPML_PB_Register_Shortcodes
  *
  * @group page-builders
+ * @group wpmltm-1847
  */
 class Test_WPML_PB_Register_Shortcodes extends WPML_PB_TestCase {
 
@@ -178,6 +179,7 @@ class Test_WPML_PB_Register_Shortcodes extends WPML_PB_TestCase {
 			                            'get_shortcode_tag_type',
 			                            'get_shortcode_attributes',
 			                            'get_shortcode_attribute_encoding',
+			                            'get_shortcode_tag_encoding_condition',
 			                            'remove_string'
 		                            ) )
 		                            ->disableOriginalConstructor()

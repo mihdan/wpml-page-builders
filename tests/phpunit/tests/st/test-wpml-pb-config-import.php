@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class Test_WPML_PB_Config_Import
+ */
 class Test_WPML_PB_Config_Import extends OTGS_TestCase {
 	/**
 	 * @param $shortcode
@@ -38,7 +41,7 @@ class Test_WPML_PB_Config_Import extends OTGS_TestCase {
 					),
 				),
 				array(
-					'tag'        => array( 'value' => 'tag1', 'encoding' => '', 'type' => '' ),
+					'tag'        => array( 'value' => 'tag1', 'encoding' => '', 'encoding-condition' => '', 'type' => '' ),
 					'attributes' => array(
 						array( 'value' => 'attribute1', 'encoding' => '', 'type' => '' ),
 						array( 'value' => 'attribute2', 'encoding' => '', 'type' => '' ),
@@ -51,7 +54,7 @@ class Test_WPML_PB_Config_Import extends OTGS_TestCase {
 					'attributes' => array( 'attribute' => array( 'value' => 'attribute3' ) ),
 				),
 				array(
-					'tag'        => array( 'value' => 'tag2', 'encoding' => '', 'type' => '' ),
+					'tag'        => array( 'value' => 'tag2', 'encoding' => '', 'encoding-condition' => '', 'type' => '' ),
 					'attributes' => array(
 						array( 'value' => 'attribute3', 'encoding' => '', 'type' => '' ),
 					),
@@ -62,7 +65,7 @@ class Test_WPML_PB_Config_Import extends OTGS_TestCase {
 					'tag' => array( 'value' => 'tag3' ),
 				),
 				array(
-					'tag'        => array( 'value' => 'tag3', 'encoding' => '', 'type' => '' ),
+					'tag'        => array( 'value' => 'tag3', 'encoding' => '', 'encoding-condition' => '', 'type' => '' ),
 					'attributes' => array(),
 				),
 			),
@@ -71,7 +74,16 @@ class Test_WPML_PB_Config_Import extends OTGS_TestCase {
 					'tag' => array( 'value' => 'tag4', 'attr' => array( 'encoding' => 'encoding1' ) ),
 				),
 				array(
-					'tag'        => array( 'value' => 'tag4', 'encoding' => 'encoding1', 'type' => '' ),
+					'tag'        => array( 'value' => 'tag4', 'encoding' => 'encoding1', 'encoding-condition' => '', 'type' => '' ),
+					'attributes' => array(),
+				),
+			),
+			'encoded tag with condition'        => array(
+				array(
+					'tag' => array( 'value' => 'tag4', 'attr' => array( 'encoding' => 'encoding1', 'encoding-condition' => 'option:something=1' ) ),
+				),
+				array(
+					'tag'        => array( 'value' => 'tag4', 'encoding' => 'encoding1', 'encoding-condition' => 'option:something=1', 'type' => '' ),
 					'attributes' => array(),
 				),
 			),
@@ -86,7 +98,7 @@ class Test_WPML_PB_Config_Import extends OTGS_TestCase {
 					),
 				),
 				array(
-					'tag'        => array( 'value' => 'tag5', 'encoding' => '', 'type' => '' ),
+					'tag'        => array( 'value' => 'tag5', 'encoding' => '', 'encoding-condition' => '', 'type' => '' ),
 					'attributes' => array(
 						array( 'value' => 'attribute4', 'encoding' => 'encoding2', 'type' => '' ),
 					),
@@ -146,7 +158,7 @@ class Test_WPML_PB_Config_Import extends OTGS_TestCase {
 		);
 
 		$expected_value = array(
-			'tag'        => array( 'value' => 'tag1', 'encoding' => '', 'type' => 'link' ),
+			'tag'        => array( 'value' => 'tag1', 'encoding' => '', 'encoding-condition' => '', 'type' => 'link' ),
 			'attributes' => array(
 				array( 'value' => 'attribute1', 'encoding' => '', 'type' => 'link' ),
 				array( 'value' => 'attribute2', 'encoding' => '', 'type' => '' ),

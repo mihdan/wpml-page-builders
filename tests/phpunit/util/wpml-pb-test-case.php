@@ -24,27 +24,16 @@ abstract class WPML_PB_TestCase extends OTGS_TestCase {
 		return $factory;
 	}
 
-	protected function get_shortcode_strategy( WPML_PB_Factory $factory, $encoding = '' ) {
+	protected function get_shortcode_strategy( WPML_PB_Factory $factory, $encoding = '', $encoding_condition = '' ) {
 		$strategy = new WPML_PB_Shortcode_Strategy();
 		$strategy->add_shortcodes(
 			array(
 				array(
 					'tag'        => array(
-						'value'    => 'vc_column_text',
-						'encoding' => $encoding,
-						'type' => '',
-					),
-					'attributes' => array(
-						array( 'value' => 'text', 'encoding' => $encoding, 'type' => '' ),
-						array( 'value' => 'heading', 'encoding' => $encoding, 'type' => '' ),
-						array( 'value' => 'title', 'encoding' => $encoding, 'type' => '' ),
-					),
-				),
-				array(
-					'tag'        => array(
-						'value'    => 'vc_text_separator',
-						'encoding' => $encoding,
-						'type' => '',
+						'value'              => 'vc_column_text',
+						'encoding'           => $encoding,
+						'encoding-condition' => $encoding_condition,
+						'type'               => '',
 					),
 					'attributes' => array(
 						array( 'value' => 'text', 'encoding' => $encoding, 'type' => '' ),
@@ -54,15 +43,30 @@ abstract class WPML_PB_TestCase extends OTGS_TestCase {
 				),
 				array(
 					'tag' => array(
-						'value'    => 'vc_message',
-						'encoding' => $encoding,
+						'value'              => 'vc_text_separator',
+						'encoding'           => $encoding,
+						'encoding-condition' => $encoding_condition,
+						'type'               => '',
+					),
+					'attributes' => array(
+						array( 'value' => 'text', 'encoding' => $encoding, 'type' => '' ),
+						array( 'value' => 'heading', 'encoding' => $encoding, 'type' => '' ),
+						array( 'value' => 'title', 'encoding' => $encoding, 'type' => '' ),
 					),
 				),
 				array(
-					'tag'        => array(
-						'value'    => 'tag_with_link',
-						'encoding' => $encoding,
-						'type' => 'link',
+					'tag' => array(
+						'value'              => 'vc_message',
+						'encoding'           => $encoding,
+						'encoding-condition' => $encoding_condition,
+					),
+				),
+				array(
+					'tag' => array(
+						'value'              => 'tag_with_link',
+						'encoding'           => $encoding,
+						'encoding-condition' => $encoding_condition,
+						'type'               => 'link',
 					),
 					'attributes' => array(
 						array( 'value' => 'link', 'encoding' => $encoding, 'type' => 'link' ),
