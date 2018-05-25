@@ -5,7 +5,7 @@ class WPML_PB_Custom_Field_Config_Import {
 	private $config;
 
 	public function add_hooks() {
-		add_filter( 'wpml_config_array', array( $this, 'save_config' ) );
+		add_filter( 'wpml_config_array', array( $this, 'parse' ) );
 	}
 
 	/**
@@ -13,7 +13,7 @@ class WPML_PB_Custom_Field_Config_Import {
 	 *
 	 * @return array
 	 */
-	public function save_config( $config_data ) {
+	public function parse( $config_data ) {
 		$old_config = $this->get();
 		$config     = array();
 

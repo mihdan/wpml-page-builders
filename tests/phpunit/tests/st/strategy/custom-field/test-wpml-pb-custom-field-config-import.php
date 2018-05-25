@@ -12,7 +12,7 @@ class Test_WPML_PB_Custom_Field_Config_Import extends OTGS_TestCase {
 	 */
 	public function it_adds_hooks() {
 		$subject = new WPML_PB_Custom_Field_Config_Import();
-		\WP_Mock::expectFilterAdded( 'wpml_config_array', array( $subject, 'save_config' ) );
+		\WP_Mock::expectFilterAdded( 'wpml_config_array', array( $subject, 'parse' ) );
 		$subject->add_hooks();
 	}
 
@@ -20,7 +20,7 @@ class Test_WPML_PB_Custom_Field_Config_Import extends OTGS_TestCase {
 	 * @test
 	 * @dataProvider dp_nodes
 	 */
-	public function it_saves_config( $node ) {
+	public function it_parse_config_data( $node ) {
 		$config = $this->get_config_data();
 		$config['wpml-config']['page-builder-custom-field']['nodes'] = $node;
 		$subject = new WPML_PB_Custom_Field_Config_Import();
@@ -58,7 +58,7 @@ class Test_WPML_PB_Custom_Field_Config_Import extends OTGS_TestCase {
 			'times' => 1,
 		));
 
-		$this->assertEquals( $config, $subject->save_config( $config ) );
+		$this->assertEquals( $config, $subject->parse( $config ) );
 	}
 
 	/**
