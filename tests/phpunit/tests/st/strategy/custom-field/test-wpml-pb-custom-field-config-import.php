@@ -3,6 +3,7 @@
 /**
  * Class Test_WPML_PB_Custom_Field_Config_Import
  *
+ * @group custom-field
  * @group wpmlcore-5378
  */
 class Test_WPML_PB_Custom_Field_Config_Import extends OTGS_TestCase {
@@ -11,7 +12,7 @@ class Test_WPML_PB_Custom_Field_Config_Import extends OTGS_TestCase {
 	 * @test
 	 */
 	public function it_adds_hooks() {
-		$subject = new WPML_PB_Custom_Field_Config_Import();
+		$subject = new WPML_PB_Custom_Field_Config_Import( $this->get_custom_field_factory() );
 		\WP_Mock::expectFilterAdded( 'wpml_config_array', array( $subject, 'parse' ) );
 		$subject->add_hooks();
 	}
@@ -21,9 +22,10 @@ class Test_WPML_PB_Custom_Field_Config_Import extends OTGS_TestCase {
 	 * @dataProvider dp_nodes
 	 */
 	public function it_parse_config_data( $node ) {
+		$custom_field_factory = $this->get_custom_field_factory();
 		$config = $this->get_config_data();
 		$config['wpml-config']['page-builder-custom-field']['nodes'] = $node;
-		$subject = new WPML_PB_Custom_Field_Config_Import();
+		$subject = new WPML_PB_Custom_Field_Config_Import( $custom_field_factory );
 
 		\WP_Mock::wpFunction( 'get_option', array(
 			'args' => WPML_PB_Custom_Field_Config::CONFIG_FIELD_KEY,
@@ -65,8 +67,9 @@ class Test_WPML_PB_Custom_Field_Config_Import extends OTGS_TestCase {
 	 * @test
 	 */
 	public function it_gets_config() {
+		$custom_field_factory = $this->get_custom_field_factory();
 		$config_data = rand_str( 10 );
-		$subject     = new WPML_PB_Custom_Field_Config_Import();
+		$subject     = new WPML_PB_Custom_Field_Config_Import( $custom_field_factory );
 
 		\WP_Mock::wpFunction( 'get_option', array(
 			'args' => WPML_PB_Custom_Field_Config::CONFIG_FIELD_KEY,
@@ -127,5 +130,11 @@ class Test_WPML_PB_Custom_Field_Config_Import extends OTGS_TestCase {
 				)
 			)
 		);
+	}
+
+	private function get_custom_field_factory() {
+		return $this->getMockBuilder( 'WPML_PB_Custom_Field_Factory' )
+			->disableOriginalConstructor()
+			->getMock();
 	}
 }

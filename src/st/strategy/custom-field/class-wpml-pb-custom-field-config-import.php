@@ -3,6 +3,11 @@
 class WPML_PB_Custom_Field_Config_Import {
 
 	private $config;
+	private $custom_field_factory;
+
+	public function __construct( WPML_PB_Custom_Field_Factory $custom_field_factory ) {
+		$this->custom_field_factory = $custom_field_factory;
+	}
 
 	public function add_hooks() {
 		add_filter( 'wpml_config_array', array( $this, 'parse' ) );
@@ -25,7 +30,7 @@ class WPML_PB_Custom_Field_Config_Import {
 				'nodes'        => $this->get_nodes( $config_data['wpml-config'][ WPML_PB_Custom_Field_Config::CUSTOM_FIELD_DATA_KEY ][ WPML_PB_Custom_Field_Config::NODES_KEY ] ),
 			);
 
-			$config = new WPML_PB_Custom_Field_Config( $params );
+			$config = $this->custom_field_factory->create_config( $params );
 		}
 
 		if ( $config != $old_config ) {
@@ -46,7 +51,7 @@ class WPML_PB_Custom_Field_Config_Import {
 			if ( is_array( $node ) ) {
 				foreach ( $node as $field_key => $field ) {
 					if ( is_array( $field ) ) {
-						$node_config = new WPML_PB_Custom_Field_Node();
+						$node_config = $this->custom_field_factory->create_node();
 
 						$fields      = array();
 						$parent_node = '';
@@ -86,7 +91,7 @@ class WPML_PB_Custom_Field_Config_Import {
 	 * @return WPML_PB_Custom_Field_Node_Field
 	 */
 	private function get_new_node_field( $field ) {
-		return new WPML_PB_Custom_Field_Node_Field( array(
+		return $this->custom_field_factory->create_node_field( array(
 			'name'        => $field['value'],
 			'editor_type' => $field['attr'][ WPML_PB_Custom_Field_Node_Field::EDITOR_TYPE_KEY ],
 			'label'       => $field['attr'][ WPML_PB_Custom_Field_Node_Field::LABEL_KEY ],
