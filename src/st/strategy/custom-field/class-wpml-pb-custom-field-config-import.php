@@ -2,6 +2,9 @@
 
 class WPML_PB_Custom_Field_Config_Import {
 
+	/**
+	 * @var WPML_PB_Custom_Field_Config
+	 */
 	private $config;
 	private $custom_field_factory;
 
