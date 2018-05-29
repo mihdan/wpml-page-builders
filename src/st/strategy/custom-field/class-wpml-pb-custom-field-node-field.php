@@ -20,6 +20,11 @@ class WPML_PB_Custom_Field_Node_Field {
 	 */
 	private $label;
 
+	/**
+	 * @var string
+	 */
+	private $value;
+
 	public function __construct( array $params ) {
 		foreach ( get_object_vars( $this ) as $property => $value ) {
 			if ( array_key_exists( $property, $params ) ) {
@@ -38,5 +43,13 @@ class WPML_PB_Custom_Field_Node_Field {
 
 	public function get_name() {
 		return $this->name;
+	}
+
+	public function get_value() {
+		return $this->value;
+	}
+
+	public function set_value( $value ) {
+		return $this->value = $value;
 	}
 }

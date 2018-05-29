@@ -3,16 +3,9 @@
 interface IWPML_PB_Custom_Field_Parser {
 
 	/**
-	 * @param string $data
+	 * @param mixed $data
 	 *
 	 * @return array
 	 */
 	public function parse( $data );
-
-	/**
-	 * @param array $data
-	 *
-	 * @return string
-	 */
-	public function implode( $data );
 }

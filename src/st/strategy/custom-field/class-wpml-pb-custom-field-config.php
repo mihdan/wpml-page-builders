@@ -9,6 +9,8 @@ class WPML_PB_Custom_Field_Config {
 	const NODES_KEY = 'nodes';
 	const NODE_FIELDS_KEY = 'fields';
 	const CONFIG_FIELD_KEY = '_wpml_pb_custom_field_schema';
+	const JSON_FORMAT = 'json';
+	const SERIALIZED_FORMAT = 'serialize';
 
 	/**
 	 * @var string
