@@ -12,7 +12,7 @@ class WPML_PB_Custom_Field_Node_Map {
 
 	public function get_node( $name ) {
 		foreach ( $this->config->get_nodes() as $node ) {
-			if ( $node->get_name() === $name ) {
+			if ( $node->get_name() === $name || $node->get_parent_node() === $name ) {
 				$fields = array();
 				foreach ( $node->get_fields() as $field ) {
 					$fields[] = $this->custom_field_factory->create_node_field( array(
@@ -26,6 +26,8 @@ class WPML_PB_Custom_Field_Node_Map {
 					'name' => $node->get_name(),
 					'fields' => $fields,
 					'parent_node' => $node->get_parent_node(),
+					'fields_key' => $node->get_fields_key(),
+					'items_key' => $node->get_items_key(),
 				) );
 			}
 		}

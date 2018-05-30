@@ -78,6 +78,15 @@ class WPML_PB_Custom_Field_Config_Import {
 						if ( $parent_node ) {
 							$node_config->set_parent_node( $parent_node );
 						}
+
+						if ( isset( $node[ 'fields_key' ] ) ) {
+							$node_config->set_fields_key( $node[ 'fields_key' ] );
+						}
+
+						if ( isset( $node[ 'items_key' ] ) ) {
+							$node_config->set_items_key( $node[ 'items_key' ] );
+						}
+
 						$node_config->set_fields( $fields );
 						$nodes_config[] = $node_config;
 					}
