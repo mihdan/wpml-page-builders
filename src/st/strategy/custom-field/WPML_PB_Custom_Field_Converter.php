@@ -48,12 +48,12 @@ class WPML_PB_Custom_Field_Parser {
 	private function build_child_nodes( $data, $node_name ) {
 		$node = $this->custom_field_map->get_node( $node_name );
 		$fields = array();
-		foreach ( $data as $item_field => $item ) {
+		foreach ( $data as $key => $item ) {
 			if ( is_array( $item ) ) {
 				$this->build_child_nodes( $item, $node_name );
 			} else {
 				foreach ( $node->get_fields() as $field ) {
-					if ( $field->get_name() === $item_field ) {
+					if ( $field->get_name() === $key ) {
 						$field->set_value( $data[ $field->get_name() ] );
 						$fields[] = $field;
 					}
