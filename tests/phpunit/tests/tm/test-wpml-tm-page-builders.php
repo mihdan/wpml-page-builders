@@ -285,6 +285,8 @@ class Test_WPML_TM_Page_Builders extends OTGS_TestCase {
 			$job->translation_service
 		);
 
+		\WP_Mock::expectAction( 'wpml_pb_finished_adding_string_translations' );
+
 		$subject->pro_translation_completed_action( $new_post_id, $fields, $job );
 	}
 

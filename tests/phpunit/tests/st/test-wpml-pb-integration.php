@@ -57,6 +57,7 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 			'cleanup_strings_after_translation_completed',
 		),	10, 3 );
 		\WP_Mock::expectFilterAdded( 'wpml_tm_translation_job_data', array( $pb_integration, 'rescan' ), 9, 2 );
+		\WP_Mock::expectActionAdded( 'wpml_pb_finished_adding_string_translations', array( $pb_integration, 'save_translations_to_post' ) );
 
 		$pb_integration->add_hooks();
 	}
