@@ -12,15 +12,22 @@ class Test_WPML_Page_Builders_Defined extends WPML_PB_TestCase2 {
 
 		$expected['page-builders'] = array(
 			'beaver-builder' => array(
-				'name' => 'Beaver Builder',
-				'constant' => 'FL_BUILDER_VERSION',
+				'name'            => 'Beaver Builder',
+				'constant'        => 'FL_BUILDER_VERSION',
 				'notices-display' => array(
 					'wpml-translation-editor',
 				),
 			),
-			'elementor' => array(
-				'name' => 'Elementor',
-				'constant' => 'ELEMENTOR_VERSION',
+			'elementor'      => array(
+				'name'            => 'Elementor',
+				'constant'        => 'ELEMENTOR_VERSION',
+				'notices-display' => array(
+					'wpml-translation-editor',
+				),
+			),
+			'gutenberg'      => array(
+				'name'            => 'Gutenberg',
+				'constant'        => 'GUTENBERG_VERSION',
 				'notices-display' => array(
 					'wpml-translation-editor',
 				),
@@ -40,12 +47,16 @@ class Test_WPML_Page_Builders_Defined extends WPML_PB_TestCase2 {
 		$pb_settings = array(
 			'beaver-builder' => array(
 				'constant' => 'FL_BUILDER_VERSION',
-				'factory' => 'WPML_Beaver_Builder_Integration_Factory',
+				'factory'  => 'WPML_Beaver_Builder_Integration_Factory',
 			),
-			'elementor' => array(
+			'elementor'      => array(
 				'constant' => 'ELEMENTOR_VERSION',
-				'factory' => 'WPML_Elementor_Integration_Factory',
-			)
+				'factory'  => 'WPML_Elementor_Integration_Factory',
+			),
+			'gutenberg'      => array(
+				'constant' => 'GUTENBERG_VERSION',
+				'factory'  => 'WPML_Gutenberg_Integration_Factory',
+			),
 		);
 
 		$subject = new WPML_Page_Builders_Defined();
