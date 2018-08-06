@@ -12,18 +12,20 @@ class Test_WPML_Page_Builders_Page_Built extends OTGS_TestCase {
 	 */
 	public function it_returns_true_when_it_is_a_page_builder_page() {
 		$post = $this->getMockBuilder( 'WP_Post' )
-			->disableOriginalConstructor()
-			->getMock();
+		             ->disableOriginalConstructor()
+		             ->getMock();
 
 		$post->post_content = '[vc_row][/vc_row]';
 
-		$config = array(
-			'wpml-config' => array(
-				'built_with_page_builder' => 'vc_row',
-			),
-		);
+		$config = $this->getMockBuilder( 'WPML_Config_Built_With_Page_Builders' )
+		               ->setMethods( array( 'get' ) )
+		               ->disableOriginalConstructor()
+		               ->getMock();
 
-		$subject = new WPML_Page_Builders_Page( $config );
+		$config->method( 'get' )
+		       ->willReturn( array( '/\[vc_row\]/' ) );
+
+		$subject = new WPML_Page_Builders_Page_Built( $config );
 		$this->assertTrue( $subject->is_page_builder_page( $post ) );
 	}
 
@@ -37,13 +39,15 @@ class Test_WPML_Page_Builders_Page_Built extends OTGS_TestCase {
 
 		$post->post_content = 'my content';
 
-		$config = array(
-			'wpml-config' => array(
-				'built_with_page_builder' => 'vc_row',
-			),
-		);
+		$config = $this->getMockBuilder( 'WPML_Config_Built_With_Page_Builders' )
+		               ->setMethods( array( 'get' ) )
+		               ->disableOriginalConstructor()
+		               ->getMock();
 
-		$subject = new WPML_Page_Builders_Page( $config );
+		$config->method( 'get' )
+		       ->willReturn( array( '/\[vc_row\]/' ) );
+
+		$subject = new WPML_Page_Builders_Page_Built( $config );
 		$this->assertFalse( $subject->is_page_builder_page( $post ) );
 	}
 }

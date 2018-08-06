@@ -2,6 +2,7 @@
 
 /**
  * @group page-builders
+ * @group adriano
  */
 class Test_WPML_TM_Page_Builders extends OTGS_TestCase {
 
@@ -261,6 +262,7 @@ class Test_WPML_TM_Page_Builders extends OTGS_TestCase {
 		$job->language_code       = rand_str( 2 );
 		$job->translator_id       = rand( 1, 50 );
 		$job->translation_service = rand( 1, 50 );
+		$job->original_doc_id     = 20;
 
 		$field_string1 = $this->find_field_with_slug( $data['string1_field_name'], $fields );
 		$field_string2 = $this->find_field_with_slug( $data['string2_field_name'], $fields );
@@ -285,7 +287,7 @@ class Test_WPML_TM_Page_Builders extends OTGS_TestCase {
 			$job->translation_service
 		);
 
-		\WP_Mock::expectAction( 'wpml_pb_finished_adding_string_translations' );
+		\WP_Mock::expectAction( 'wpml_pb_finished_adding_string_translations', $new_post_id, $job->original_doc_id, $fields );
 
 		$subject->pro_translation_completed_action( $new_post_id, $fields, $job );
 	}
