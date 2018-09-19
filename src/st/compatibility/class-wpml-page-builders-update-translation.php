@@ -57,5 +57,4 @@ abstract class WPML_Page_Builders_Update_Translation extends WPML_Page_Builders_
 	}
 
 	abstract protected function update_strings_in_modules( array &$data_array );
-	abstract protected function update_strings_in_node( $node_id, $settings );
 }
