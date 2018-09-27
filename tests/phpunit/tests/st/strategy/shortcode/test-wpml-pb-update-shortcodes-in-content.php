@@ -266,6 +266,34 @@ class Test_WPML_PB_Update_Shortcodes_In_Content extends WPML_PB_TestCase {
 					),
 				),
 			),
+			'Backward reference in translation - https://onthegosystems.myjetbrains.com/youtrack/issue/wpmlcore-5291' => array(
+				'[et_pb_tab title="$25.each"]$1999.each[/et_pb_tab]',
+				'[et_pb_tab title="$4.each"]$123.each[/et_pb_tab]',
+				array( 'et_pb_tab' ),
+				array( 'et_pb_tab' => array( 'title' ) ),
+				array(
+					array(
+						'block'      => '[et_pb_tab title="$25.each"]$1999.each[/et_pb_tab]',
+						'tag'        => 'et_pb_tab',
+						'attributes' => ' title="$25.each"',
+						'content'    => '$1999.each',
+					),
+				),
+				array(
+					md5( '$25.each' ) => array(
+						'fr' => array(
+							'status' => ICL_TM_COMPLETE,
+							'value'  => '$4.each',
+						),
+					),
+					md5( '$1999.each' ) => array(
+						'fr' => array(
+							'status' => ICL_TM_COMPLETE,
+							'value'  => '$123.each',
+						),
+					),
+				),
+			),
 		);
 	}
 
