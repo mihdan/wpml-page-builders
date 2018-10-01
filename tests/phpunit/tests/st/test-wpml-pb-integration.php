@@ -47,6 +47,10 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 			$pb_integration,
 			'queue_save_post_actions'
 		), PHP_INT_MAX, 2 );
+		\WP_Mock::expectActionAdded( 'wpml_pb_resave_post_translation', array(
+			$pb_integration,
+			'resave_post_translation_in_shutdown'
+		), 10, 1 );
 		\WP_Mock::expectActionAdded( 'icl_st_add_string_translation', array(
 			$pb_integration,
 			'new_translation'
@@ -114,6 +118,8 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 	/**
 	 * @dataProvider dp_do_shutdown_action
 	 * @group wpmlpb-160
+	 *
+	 * @param bool $wpml_media_enabled
 	 */
 	public function test_do_shutdown_action( $wpml_media_enabled ) {
 		$original_post   = $this->get_post( 1 );
@@ -144,6 +150,92 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 				'args'  => array( 'icl_st_add_string_translation', array( $pb_integration, 'new_translation' ), 10, 1 ),
 			)
 		);
+
+		if ( $wpml_media_enabled ) {
+			$media_updater = $this->getMockBuilder( 'IWPML_PB_Media_Update' )
+			                      ->setMethods( array( 'translate' ) )->getMock();
+			$media_updater->expects( $this->once() )->method( 'translate' )->with( $translated_post );
+
+			\WP_Mock::onFilter( 'wmpl_pb_get_media_updaters' )
+			        ->with( array() )
+			        ->reply( array( $media_updater ) );
+		}
+
+		$pb_integration->do_shutdown_action();
+	}
+
+	/**
+	 * @dataProvider dp_do_shutdown_action
+	 * @group wpmlcore-5765
+	 *
+	 * @param bool $wpml_media_enabled
+	 */
+	public function test_do_shutdown_action_with_resaved_post_element( $wpml_media_enabled ) {
+		$target_lang        = 'fr';
+		$original_post      = $this->get_post( 1 );
+		$original_element   = $this->get_post_element( $original_post->ID, $original_post, 'en' );
+		$translated_post    = $this->get_post( 2 );
+		$translated_element = $this->get_post_element( $translated_post->ID, $translated_post, $target_lang, $original_element );
+
+		\WP_Mock::wpFunction( 'did_action', array(
+             'args'   => array( 'shutdown' ),
+             'return' => 0,
+         ));
+
+		$wp_api = $this->getMockBuilder( 'constant' )->setMethods( array( 'constant' ) )->getMock();
+		$wp_api->method( 'constant' )->with( 'WPML_MEDIA_VERSION' )->willReturn( $wpml_media_enabled );
+
+		$sitepress_mock  = $this->get_sitepress_mock();
+		$sitepress_mock->method( 'get_wp_api' )->willReturn( $wp_api );
+		$sitepress_mock->method( 'get_original_element_id' )
+		               ->willReturnCallback( function( $id ) use ( $original_post ) {
+			               if ( $id !== $original_post->ID ) {
+				               return $original_post->ID;
+			               }
+
+			               return $id;
+		               });
+
+		$updated_package = $this->getMockBuilder( 'WPML_Package' )
+								->disableOriginalConstructor()->getMock();
+
+		$string_translation = $this->getMockBuilder( 'WPML_PB_String_Translation' )
+		                           ->setMethods( array( 'save_translations_to_post', 'add_package_to_update_list' ) )
+		                           ->disableOriginalConstructor()
+		                           ->getMock();
+
+		$string_translation->expects( $this->once() )->method( 'save_translations_to_post' );
+		$string_translation->expects( $this->once() )->method( 'add_package_to_update_list' )
+							->with( $updated_package, $target_lang );
+
+		$factory_mock = $this->getMockBuilder( 'WPML_PB_Factory' )
+		                ->setMethods( array(
+				                'get_update_translated_posts_from_original',
+				                'get_string_translations',
+				                'get_package_strings_resave',
+                            )
+		                )->disableOriginalConstructor()
+		                ->getMock();
+
+		$strategy = $this->get_shortcode_strategy( $factory_mock );
+
+		$factory_mock->method( 'get_string_translations' )->with( $strategy )->willReturn( $string_translation );
+
+		$package_strings_resave = $this->getMockBuilder( 'WPML_PB_Package_Strings_Resave' )
+									->setMethods( array( 'from_element' ) )->disableOriginalConstructor()->getMock();
+		$package_strings_resave->expects( $this->once() )->method( 'from_element' )->with( $translated_element )->willReturn( array( $updated_package ) );
+
+		$factory_mock->method( 'get_package_strings_resave' )->willReturn( $package_strings_resave );
+
+		$pb_integration = new WPML_PB_Integration( $sitepress_mock, $factory_mock );
+		$pb_integration->add_strategy( $strategy );
+		$pb_integration->resave_post_translation_in_shutdown( $original_element );
+		$pb_integration->resave_post_translation_in_shutdown( $translated_element );
+
+		\WP_Mock::wpFunction( 'remove_action', array(
+             'times' => 1,
+             'args'  => array( 'icl_st_add_string_translation', array( $pb_integration, 'new_translation' ), 10, 1 ),
+         ));
 
 		if ( $wpml_media_enabled ) {
 			$media_updater = $this->getMockBuilder( 'IWPML_PB_Media_Update' )
@@ -356,24 +448,6 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		return $factory;
 	}
 
-	private function get_factory_mock_for_update( $post_id, $post ) {
-		$update_mock_mock = $this->getMockBuilder( 'WPML_PB_Update_Translated_Posts_From_Original' )
-		                         ->setMethods( array( 'update' ) )
-		                         ->disableOriginalConstructor()
-		                         ->getMock();
-		$update_mock_mock->expects( $this->once() )
-		                 ->method( 'update' )
-		                 ->with( $this->equalTo( $post ) );
-
-		$factory = $this->getMockBuilder( 'WPML_PB_Factory' )
-		                ->setMethods( array( 'get_update_translated_posts_from_original' ) )
-		                ->disableOriginalConstructor()
-		                ->getMock();
-		$factory->method( 'get_update_translated_posts_from_original' )->willReturn( $update_mock_mock );
-
-		return $factory;
-	}
-
 	private function get_factory_mock_for_register_translations( $translated_string_id ) {
 		$string_translation_mock = $this->getMockBuilder( 'WPML_PB_String_Translation' )
 		                                ->setMethods( array( 'new_translation', 'save_translations_to_post' ) )
@@ -406,8 +480,9 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		return $sitepress_mock;
 	}
 
+	/** @return WP_Post|PHPUnit_Framework_MockObject_MockObject */
 	private function get_post( $id = 1 ) {
-		$post               = new stdClass();
+		$post               = $this->getMockBuilder( 'WP_Post' )->getMock();
 		$post->ID           = $id;
 		$post->post_status  = 'publish';
 		$post->post_type    = 'page';
@@ -416,4 +491,20 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		return $post;
 	}
 
+	/** @return WPML_Post_Element|PHPUnit_Framework_MockObject_MockObject */
+	private function get_post_element( $post_id, WP_Post $post, $lang = null, WPML_Post_Element $source_element = null ) {
+		$element = $this->getMockBuilder( 'WPML_Post_Element' )
+		                ->setMethods( array(
+		                        'get_id',
+		                        'get_wp_object',
+		                        'get_language_code',
+		                        'get_source_element',
+		                	)
+		                )->disableOriginalConstructor()->getMock();
+		$element->method( 'get_id' )->willReturn( $post_id );
+		$element->method( 'get_wp_object' )->willReturn( $post );
+		$element->method( 'get_language_code' )->willReturn( $lang );
+		$element->method( 'get_source_element' )->willReturn( $source_element );
+		return $element;
+	}
 }
