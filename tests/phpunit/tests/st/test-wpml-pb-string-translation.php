@@ -8,15 +8,17 @@ class Test_WPML_PB_String_Translation extends WPML_PB_TestCase {
 	 * @dataProvider new_translations_data_provider
 	 */
 	public function test_new_translations( $post_id ) {
-		$translated_string_id = mt_rand();
-		$string_package_id    = mt_rand();
-		$language_1           = rand_str( 4 );
-		$language_2           = rand_str( 4 );
-		while ( $language_2 == $language_1 ) {
-			$language_2 = rand_str( 4 );
-		}
+		$translated_string_id = 1025;
+		$string_package_id    = 89;
+		$language_1           = 'de';
+		$language_2           = 'es';
 
 		list( $factory_mock, $strategy_mock ) = $this->get_factory_and_strategy_mock( $string_package_id, $language_1, $language_2, $post_id );
+
+		$strategy_mock->expects( $this->exactly( $post_id ? 3 : 0 ) )
+		         ->method( 'get_package_kind' )
+		         ->willReturn( $package_kind );
+
 		$wpdb_mock = $this->get_wpdb_mock( $string_package_id, $language_1, $language_2 );
 
 		$pb_string_translation = new WPML_PB_String_Translation( $wpdb_mock, $factory_mock, $strategy_mock );
@@ -25,14 +27,33 @@ class Test_WPML_PB_String_Translation extends WPML_PB_TestCase {
 		$pb_string_translation->save_translations_to_post();
 	}
 
+	/**
+	 * @test
+	 * @group wpmlcore-5765
+	 */
+	public function test_add_package_to_update_list() {
+		$translated_string_id = 1025;
+		$string_package_id    = 89;
+		$language_1           = 'de';
+		$language_2           = 'es';
+
+		list( $factory_mock, $strategy_mock, $package ) = $this->get_factory_and_strategy_mock( $string_package_id, $language_1, $language_2 );
+		$wpdb_mock = $this->get_wpdb_mock( $string_package_id, $language_1, $language_2 );
+
+		$pb_string_translation = new WPML_PB_String_Translation( $wpdb_mock, $factory_mock, $strategy_mock );
+		$pb_string_translation->add_package_to_update_list( $package, $language_1 );
+		$pb_string_translation->add_package_to_update_list( $package, $language_2 );
+		$pb_string_translation->save_translations_to_post();
+	}
+
 	public function new_translations_data_provider() {
 		return array(
 			'package with post id'    => array( mt_rand( 1, 100 ) ),
-			'package with no post id' => array( 0),
+			'package with no post id' => array( 0 ),
 		);
 	}
 
-	private function get_factory_and_strategy_mock( $string_package_id, $language_1, $language_2, $post_id ) {
+	private function get_factory_and_strategy_mock( $string_package_id, $language_1, $language_2, $post_id = null ) {
 		$package_kind = rand_str( 32 );
 
 		$factory       = $this->getMockBuilder( 'WPML_PB_Factory' )
@@ -45,7 +66,7 @@ class Test_WPML_PB_String_Translation extends WPML_PB_TestCase {
 		                      ->getMock();
 		$package->kind = $package_kind;
 		$package->post_id = $post_id;
-		$factory->expects( $this->exactly( 2 ) )
+		$factory->expects( $this->exactly( $post_id ? 2 : 0 ) )
 		        ->method( 'get_wpml_package' )
 		        ->with( $this->equalTo( $string_package_id ) )
 		        ->willReturn( $package );
@@ -61,9 +82,6 @@ class Test_WPML_PB_String_Translation extends WPML_PB_TestCase {
 		                 ->setMethods( array( 'get_package_kind', 'get_update_post' ) )
 		                 ->disableOriginalConstructor()
 		                 ->getMock();
-		$strategy->expects( $this->exactly( $post_id ? 3 : 0 ) )
-		         ->method( 'get_package_kind' )
-		         ->willReturn( $package_kind );
 		$package_data = array( 'package' => $package, 'languages' => array( $language_1, $language_2 ) );
 		$strategy->expects( $post_id ? $this->once() : $this->never() )
 		         ->method( 'get_update_post' )
@@ -71,7 +89,7 @@ class Test_WPML_PB_String_Translation extends WPML_PB_TestCase {
 		         ->willReturn( $update );
 
 
-		return array( $factory, $strategy );
+		return array( $factory, $strategy, $package );
 	}
 
 	private function get_wpdb_mock( $string_package_id, $language_1, $language_2 ) {

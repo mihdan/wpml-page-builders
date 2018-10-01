@@ -69,4 +69,8 @@ class WPML_PB_Factory {
 	public function get_api_hooks_content_updater( IWPML_PB_Strategy $strategy ) {
 		return new WPML_PB_Update_API_Hooks_In_Content( $strategy );
 	}
+
+	public function get_package_strings_resave() {
+		return new WPML_PB_Package_Strings_Resave( new WPML_ST_String_Factory( $this->wpdb ) );
+	}
 }

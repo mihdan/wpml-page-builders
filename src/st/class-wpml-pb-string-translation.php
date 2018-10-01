@@ -43,9 +43,9 @@ class WPML_PB_String_Translation {
 	private function get_package_for_translated_string( $translated_string_id ) {
 		$sql    = $this->wpdb->prepare(
 			"SELECT s.string_package_id, s.id, t.language
-			FROM {$this->wpdb->prefix}icl_strings s 
-			LEFT JOIN {$this->wpdb->prefix}icl_string_translations t 
-			ON s.id = t.string_id 
+			FROM {$this->wpdb->prefix}icl_strings s
+			LEFT JOIN {$this->wpdb->prefix}icl_string_translations t
+			ON s.id = t.string_id
 			WHERE t.id = %d", $translated_string_id );
 		$result = $this->wpdb->get_row( $sql );
 
@@ -56,7 +56,7 @@ class WPML_PB_String_Translation {
 		}
 	}
 
-	private function add_package_to_update_list( $package, $language ) {
+	public function add_package_to_update_list( $package, $language ) {
 		if ( ! isset( $this->packages_to_update[ $package->ID ] ) ) {
 			$this->packages_to_update[ $package->ID ] = array( 'package'   => $package,
 			                                                   'languages' => array( $language )

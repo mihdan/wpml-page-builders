@@ -52,6 +52,17 @@ class Test_WPML_PB_Factory extends WPML_PB_TestCase {
 		$this->assertInstanceOf( 'WPML_Package', $package );
 	}
 
+	/**
+	 * @test
+	 * @group wpmlcore-5765
+	 */
+	public function test_get_package_strings_resave() {
+		$this->getMockBuilder( 'WPML_ST_String_Factory' )->disableOriginalConstructor()->getMock();
+		$factory = $this->get_factory_with_mocks();
+		$package = $factory->get_package_strings_resave();
+		$this->assertInstanceOf( 'WPML_PB_Package_Strings_Resave', $package );
+	}
+
 	private function get_factory_with_mocks() {
 		global $wpdb;
 
