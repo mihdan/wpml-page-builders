@@ -47,6 +47,10 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 			$pb_integration,
 			'queue_save_post_actions'
 		), PHP_INT_MAX, 2 );
+		\WP_Mock::expectActionAdded( 'wpml_pb_apply_post_save_actions', array(
+			$pb_integration,
+			'apply_post_save_actions'
+		), 10, 1 );
 		\WP_Mock::expectActionAdded( 'icl_st_add_string_translation', array(
 			$pb_integration,
 			'new_translation'
@@ -114,6 +118,8 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 	/**
 	 * @dataProvider dp_do_shutdown_action
 	 * @group wpmlpb-160
+	 *
+	 * @param bool $wpml_media_enabled
 	 */
 	public function test_do_shutdown_action( $wpml_media_enabled ) {
 		$original_post   = $this->get_post( 1 );
@@ -144,6 +150,83 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 				'args'  => array( 'icl_st_add_string_translation', array( $pb_integration, 'new_translation' ), 10, 1 ),
 			)
 		);
+
+		if ( $wpml_media_enabled ) {
+			$media_updater = $this->getMockBuilder( 'IWPML_PB_Media_Update' )
+			                      ->setMethods( array( 'translate' ) )->getMock();
+			$media_updater->expects( $this->once() )->method( 'translate' )->with( $translated_post );
+
+			\WP_Mock::onFilter( 'wmpl_pb_get_media_updaters' )
+			        ->with( array() )
+			        ->reply( array( $media_updater ) );
+		}
+
+		$pb_integration->do_shutdown_action();
+	}
+
+	/**
+	 * @dataProvider dp_do_shutdown_action
+	 * @group wpmlcore-5765
+	 *
+	 * @param bool $wpml_media_enabled
+	 */
+	public function test_do_shutdown_action_on_items_to_apply_post_save_actions( $wpml_media_enabled ) {
+		$original_post   = $this->get_post( 1 );
+		$translated_post = $this->get_post( 2 );
+
+		$wp_api = $this->getMockBuilder( 'constant' )->setMethods( array( 'constant' ) )->getMock();
+		$wp_api->method( 'constant' )->with( 'WPML_MEDIA_VERSION' )->willReturn( $wpml_media_enabled );
+
+		$sitepress_mock  = $this->get_sitepress_mock();
+		$sitepress_mock->method( 'get_wp_api' )->willReturn( $wp_api );
+		$sitepress_mock->method( 'get_original_element_id' )
+		               ->willReturnCallback( function( $id ) use ( $original_post ) {
+			               if ( $id !== $original_post->ID ) {
+				               return $original_post->ID;
+			               }
+
+			               return $id;
+		               });
+
+
+		$string_translation = $this->getMockBuilder( 'WPML_PB_String_Translation' )
+		                           ->setMethods( array( 'save_translations_to_post' ) )
+		                           ->disableOriginalConstructor()
+		                           ->getMock();
+
+		$string_translation->expects( $this->once() )->method( 'save_translations_to_post' );
+
+		$register_shortcodes_mock = $this->getMockBuilder( 'WPML_PB_Register_Shortcodes' )
+		                                 ->setMethods( array( 'register_shortcode_strings' ) )
+		                                 ->disableOriginalConstructor()
+		                                 ->getMock();
+
+		$factory_mock = $this->getMockBuilder( 'WPML_PB_Factory' )
+		                ->setMethods( array(
+			                    'get_register_shortcodes',
+				                'get_update_translated_posts_from_original',
+				                'get_string_translations'
+                            )
+		                )->disableOriginalConstructor()
+		                ->getMock();
+
+		$factory_mock->expects( $this->once() )
+		        ->method( 'get_register_shortcodes' )
+		        ->willReturn( $register_shortcodes_mock );
+
+		$strategy = $this->get_shortcode_strategy( $factory_mock );
+
+		$factory_mock->method( 'get_string_translations' )->with( $strategy )->willReturn( $string_translation );
+
+		$pb_integration = new WPML_PB_Integration( $sitepress_mock, $factory_mock );
+		$pb_integration->add_strategy( $strategy );
+		$pb_integration->apply_post_save_actions( $original_post );
+		$pb_integration->apply_post_save_actions( $translated_post );
+
+		\WP_Mock::wpFunction( 'remove_action', array(
+             'times' => 1,
+             'args'  => array( 'icl_st_add_string_translation', array( $pb_integration, 'new_translation' ), 10, 1 ),
+         ));
 
 		if ( $wpml_media_enabled ) {
 			$media_updater = $this->getMockBuilder( 'IWPML_PB_Media_Update' )
@@ -317,6 +400,8 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		$subject->migrate_location( $post->ID, 'anything' );
 	}
 
+
+
 	private function get_factory_mock_for_shutdown() {
 		$register_shortcodes_mock = $this->getMockBuilder( 'WPML_PB_Register_Shortcodes' )
 		                                 ->setMethods( array( 'register_shortcode_strings' ) )
@@ -356,24 +441,6 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		return $factory;
 	}
 
-	private function get_factory_mock_for_update( $post_id, $post ) {
-		$update_mock_mock = $this->getMockBuilder( 'WPML_PB_Update_Translated_Posts_From_Original' )
-		                         ->setMethods( array( 'update' ) )
-		                         ->disableOriginalConstructor()
-		                         ->getMock();
-		$update_mock_mock->expects( $this->once() )
-		                 ->method( 'update' )
-		                 ->with( $this->equalTo( $post ) );
-
-		$factory = $this->getMockBuilder( 'WPML_PB_Factory' )
-		                ->setMethods( array( 'get_update_translated_posts_from_original' ) )
-		                ->disableOriginalConstructor()
-		                ->getMock();
-		$factory->method( 'get_update_translated_posts_from_original' )->willReturn( $update_mock_mock );
-
-		return $factory;
-	}
-
 	private function get_factory_mock_for_register_translations( $translated_string_id ) {
 		$string_translation_mock = $this->getMockBuilder( 'WPML_PB_String_Translation' )
 		                                ->setMethods( array( 'new_translation', 'save_translations_to_post' ) )
@@ -407,7 +474,7 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 	}
 
 	private function get_post( $id = 1 ) {
-		$post               = new stdClass();
+		$post               = $this->getMockBuilder( 'WP_Post' )->getMock();
 		$post->ID           = $id;
 		$post->post_status  = 'publish';
 		$post->post_type    = 'page';

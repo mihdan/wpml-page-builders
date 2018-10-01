@@ -58,6 +58,11 @@ class WPML_PB_Integration {
 		$this->rescan = $rescan;
 	}
 
+	public function apply_post_save_actions( WP_Post $post ) {
+		$this->new_translations_recieved = true;
+		$this->queue_save_post_actions( $post->ID, $post );
+	}
+
 	/**
 	 * @param $post_id
 	 * @param $post
@@ -101,6 +106,7 @@ class WPML_PB_Integration {
 	public function add_hooks() {
 		add_action( 'pre_post_update', array( $this, 'migrate_location' ), 10, 2 );
 		add_action( 'save_post', array( $this, 'queue_save_post_actions' ), PHP_INT_MAX, 2 );
+		add_action( 'wpml_pb_apply_post_save_actions', array( $this, 'apply_post_save_actions' ), 10, 1 );
 		add_action( 'icl_st_add_string_translation', array( $this, 'new_translation' ), 10, 1 );
 		add_action( 'shutdown', array( $this, 'do_shutdown_action' ) );
 		add_action( 'wpml_pb_finished_adding_string_translations', array( $this, 'save_translations_to_post' ) );
