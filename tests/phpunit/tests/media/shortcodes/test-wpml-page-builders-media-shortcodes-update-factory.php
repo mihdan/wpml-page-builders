@@ -10,6 +10,7 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update_Factory extends \OTGS\PHPU
 		$this->getMockBuilder( 'WPML_Translation_Element_Factory' )->disableOriginalConstructor()->getMock();
 		$this->getMockBuilder( 'WPML_Media_Attachment_By_URL_Factory' )->disableOriginalConstructor()->getMock();
 		$this->getMockBuilder( 'WPML_Media_Image_Translate' )->disableOriginalConstructor()->getMock();
+		$this->getMockBuilder( 'WPML_Media_Usage_Factory' )->disableOriginalConstructor()->getMock();
 	}
 
 	/**

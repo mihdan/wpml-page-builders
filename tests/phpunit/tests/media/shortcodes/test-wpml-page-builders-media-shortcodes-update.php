@@ -5,6 +5,9 @@
  */
 class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tools\TestCase {
 
+	const ORIGINAL_POST_ID   = 9;
+	const TRANSLATED_POST_ID = 57;
+
 	/**
 	 * @test
 	 */
@@ -40,10 +43,12 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 
 	/**
 	 * @test
+	 * @group wpmlcore-5834
 	 */
 	public function it_should_translate() {
 		$target_lang = 'fr';
 		$source_lang = 'en';
+		$original_post_id   = self::ORIGINAL_POST_ID;
 		$original_content   = '[shortcodeA image="http://example.com/union-jack.jpg" /]';
 		$translated_content = '[shortcodeA image="http://example.com/drapeau-francais.jpg" /]';
 
@@ -53,7 +58,11 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 			'times' => 1,
 		));
 
+		$source_element = $this->get_element( $source_lang, null );
+		$source_element->method( 'get_id' )->willReturn( $original_post_id );
+
 		$element = $this->get_element( $target_lang, $source_lang );
+		$element->method( 'get_source_element' )->willReturn( $source_element );
 
 		$factory = $this->get_element_factory();
 		$factory->method( 'create_post' )->with( $post->ID )->willReturn( $element );
@@ -64,14 +73,18 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 		$media_shortcodes->expects( $this->once() )
 		                 ->method( 'translate' )->with( $original_content )->willReturn( $translated_content );
 
-		$subject = $this->get_subject( $factory, $media_shortcodes );
+		$pb_media_usage = $this->get_pb_media_usage();
+		$pb_media_usage->expects( $this->once() )->method( 'update' )->with( $original_post_id );
+
+		$subject = $this->get_subject( $factory, $media_shortcodes, $pb_media_usage );
 		$subject->translate( $post );
 	}
 
-	private function get_subject( $factory = null, $media_shortcodes = null ) {
+	private function get_subject( $factory = null, $media_shortcodes = null, $pb_media_usage = null ) {
 		$factory          = $factory ? $factory : $this->get_element_factory();
 		$media_shortcodes = $media_shortcodes ? $media_shortcodes : $this->get_media_shortcodes();
-		return new WPML_Page_Builders_Media_Shortcodes_Update( $factory, $media_shortcodes );
+		$pb_media_usage   = $pb_media_usage ? $pb_media_usage : $this->get_pb_media_usage();
+		return new WPML_Page_Builders_Media_Shortcodes_Update( $factory, $media_shortcodes, $pb_media_usage );
 	}
 
 	private function get_element_factory() {
@@ -81,7 +94,7 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 
 	private function get_element( $lang, $source_lang ) {
 		$element = $this->getMockBuilder( 'WPML_Post_Element' )
-		                ->setMethods( array( 'get_language_code', 'get_source_language_code' ) )
+		                ->setMethods( array( 'get_language_code', 'get_source_language_code', 'get_source_element', 'get_id' ) )
 		                ->disableOriginalConstructor()->getMock();
 
 		$element->method( 'get_language_code' )->willReturn( $lang );
@@ -96,6 +109,12 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 		            ->disableOriginalConstructor()->getMock();
 	}
 
+	private function get_pb_media_usage() {
+		return $this->getMockBuilder( 'WPML_Page_Builders_Media_Usage' )
+		            ->setMethods( array( 'update' ) )
+		            ->disableOriginalConstructor()->getMock();
+	}
+
 	/**
 	 * @param string $content
 	 *
@@ -105,7 +124,7 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 		$post = $this->getMockBuilder( 'WP_Post' )
 		             ->disableOriginalConstructor()->getMock();
 		$post->post_content = $content;
-		$post->ID = mt_rand( 1, 100 );
+		$post->ID = self::TRANSLATED_POST_ID;
 
 		return $post;
 	}
