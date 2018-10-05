@@ -68,6 +68,18 @@ class WPML_PB_String_Translation {
 		}
 	}
 
+	/**
+	 * @param int    $original_post_id
+	 * @param string $target_lang
+	 */
+	public function add_post_packages_to_update_list( $original_post_id, $target_lang ) {
+		$string_packages =  apply_filters( 'wpml_st_get_post_string_packages', false, $original_post_id );
+
+		foreach ( $string_packages as $package ) {
+			$this->add_package_to_update_list( $package, $target_lang );
+		}
+	}
+
 	public function get_package_strings( $package_data ) {
 		$strings = array();
 		$package_id = $this->get_package_id( $package_data );

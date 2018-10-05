@@ -47,9 +47,9 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 			$pb_integration,
 			'queue_save_post_actions'
 		), PHP_INT_MAX, 2 );
-		\WP_Mock::expectActionAdded( 'wpml_pb_apply_post_save_actions', array(
+		\WP_Mock::expectActionAdded( 'wpml_pb_queue_post_element_translation', array(
 			$pb_integration,
-			'apply_post_save_actions'
+			'queue_post_element_translation'
 		), 10, 1 );
 		\WP_Mock::expectActionAdded( 'icl_st_add_string_translation', array(
 			$pb_integration,
@@ -170,9 +170,11 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 	 *
 	 * @param bool $wpml_media_enabled
 	 */
-	public function test_do_shutdown_action_on_items_to_apply_post_save_actions( $wpml_media_enabled ) {
-		$original_post   = $this->get_post( 1 );
-		$translated_post = $this->get_post( 2 );
+	public function test_do_shutdown_action_with_queued_post_elements( $wpml_media_enabled ) {
+		$original_post      = $this->get_post( 1 );
+		$original_element   = $this->get_post_element( $original_post->ID, $original_post );
+		$translated_post    = $this->get_post( 2 );
+		$translated_element = $this->get_post_element( $translated_post->ID, $translated_post );
 
 		$wp_api = $this->getMockBuilder( 'constant' )->setMethods( array( 'constant' ) )->getMock();
 		$wp_api->method( 'constant' )->with( 'WPML_MEDIA_VERSION' )->willReturn( $wpml_media_enabled );
@@ -220,8 +222,8 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 
 		$pb_integration = new WPML_PB_Integration( $sitepress_mock, $factory_mock );
 		$pb_integration->add_strategy( $strategy );
-		$pb_integration->apply_post_save_actions( $original_post );
-		$pb_integration->apply_post_save_actions( $translated_post );
+		$pb_integration->queue_post_element_translation( $original_element );
+		$pb_integration->queue_post_element_translation( $translated_element );
 
 		\WP_Mock::wpFunction( 'remove_action', array(
              'times' => 1,
@@ -473,6 +475,7 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		return $sitepress_mock;
 	}
 
+	/** @return WP_Post|PHPUnit_Framework_MockObject_MockObject */
 	private function get_post( $id = 1 ) {
 		$post               = $this->getMockBuilder( 'WP_Post' )->getMock();
 		$post->ID           = $id;
@@ -483,4 +486,16 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		return $post;
 	}
 
+	/** @return WPML_Post_Element|PHPUnit_Framework_MockObject_MockObject */
+	private function get_post_element( $post_id, WP_Post $post ) {
+		$element = $this->getMockBuilder( 'WPML_Post_Element' )
+		                ->setMethods( array(
+		                        'get_id',
+		                        'get_wp_object',
+		                	)
+		                )->disableOriginalConstructor()->getMock();
+		$element->method( 'get_id' )->willReturn( $post_id );
+		$element->method( 'get_wp_object' )->willReturn( $post );
+		return $element;
+	}
 }
