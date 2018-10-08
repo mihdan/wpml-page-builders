@@ -56,7 +56,7 @@ class WPML_PB_String_Translation {
 		}
 	}
 
-	private function add_package_to_update_list( $package, $language ) {
+	public function add_package_to_update_list( $package, $language ) {
 		if ( ! isset( $this->packages_to_update[ $package->ID ] ) ) {
 			$this->packages_to_update[ $package->ID ] = array( 'package'   => $package,
 			                                                   'languages' => array( $language )

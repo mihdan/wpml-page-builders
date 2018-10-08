@@ -58,24 +58,23 @@ class WPML_PB_Integration {
 		$this->rescan = $rescan;
 	}
 
-	public function queue_post_element_translation( WPML_Post_Element $post_element ) {
-		if ( ! $post_element->get_source_element() ) {
+	public function resave_post_translation_in_shutdown( WPML_Post_Element $post_element ) {
+		if ( ! $post_element->get_source_element()
+			 || did_action( 'shutdown' )
+			 || array_key_exists( $post_element->get_id(), $this->save_post_queue )
+		) {
 			return;
 		}
 
-		$this->new_translations_recieved = true;
-
-		$post_lang        = $post_element->get_language_code();
-		$post_id          = $post_element->get_id();
-		$post             = $post_element->get_wp_object();
-		$original_post_id = $post_element->get_source_element()->get_id();
+		$updated_packages = $this->factory->get_package_strings_resave()->from_element( $post_element );
 
 		foreach ( $this->strategies as $strategy ) {
 			$this->factory->get_string_translations( $strategy )
-			              ->add_post_packages_to_update_list( $original_post_id, $post_lang );
+			              ->add_package_to_update_list( $updated_packages, $post_element->get_language_code() );
 		}
 
-		$this->queue_save_post_actions( $post_id, $post );
+		$this->new_translations_recieved = true;
+		$this->queue_save_post_actions( $post_element->get_id(), $post_element->get_wp_object() );
 	}
 
 	/**
@@ -121,7 +120,7 @@ class WPML_PB_Integration {
 	public function add_hooks() {
 		add_action( 'pre_post_update', array( $this, 'migrate_location' ), 10, 2 );
 		add_action( 'save_post', array( $this, 'queue_save_post_actions' ), PHP_INT_MAX, 2 );
-		add_action( 'wpml_pb_queue_post_element_translation', array( $this, 'queue_post_element_translation' ), 10, 1 );
+		add_action( 'wpml_pb_resave_post_translation', array( $this, 'resave_post_translation_in_shutdown' ), 10, 1 );
 		add_action( 'icl_st_add_string_translation', array( $this, 'new_translation' ), 10, 1 );
 		add_action( 'shutdown', array( $this, 'do_shutdown_action' ) );
 		add_action( 'wpml_pb_finished_adding_string_translations', array( $this, 'save_translations_to_post' ) );

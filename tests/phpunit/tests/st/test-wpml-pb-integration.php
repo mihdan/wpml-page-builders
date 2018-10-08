@@ -47,9 +47,9 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 			$pb_integration,
 			'queue_save_post_actions'
 		), PHP_INT_MAX, 2 );
-		\WP_Mock::expectActionAdded( 'wpml_pb_queue_post_element_translation', array(
+		\WP_Mock::expectActionAdded( 'wpml_pb_resave_post_translation', array(
 			$pb_integration,
-			'queue_post_element_translation'
+			'resave_post_translation_in_shutdown'
 		), 10, 1 );
 		\WP_Mock::expectActionAdded( 'icl_st_add_string_translation', array(
 			$pb_integration,
@@ -222,8 +222,8 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 
 		$pb_integration = new WPML_PB_Integration( $sitepress_mock, $factory_mock );
 		$pb_integration->add_strategy( $strategy );
-		$pb_integration->queue_post_element_translation( $original_element );
-		$pb_integration->queue_post_element_translation( $translated_element );
+		$pb_integration->resave_post_translation_in_shutdown( $original_element );
+		$pb_integration->resave_post_translation_in_shutdown( $translated_element );
 
 		\WP_Mock::wpFunction( 'remove_action', array(
              'times' => 1,
