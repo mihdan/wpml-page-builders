@@ -25,10 +25,6 @@ class WPML_Page_Builders_Media_Shortcodes_Update implements IWPML_PB_Media_Updat
 	 * @param WP_Post $post
 	 */
 	public function translate( $post ) {
-		if ( $this->has_no_shortcode( $post->post_content ) ) {
-			return;
-		}
-
 		if ( ! $this->media_shortcodes->has_media_shortcode( $post->post_content ) ) {
 			return;
 		}
@@ -45,10 +41,15 @@ class WPML_Page_Builders_Media_Shortcodes_Update implements IWPML_PB_Media_Updat
 
 		$this->media_usage->update( $element->get_source_element()->get_id() );
 
-		wp_update_post( $post );
-	}
-
-	private function has_no_shortcode( $content ) {
-		return strpos( $content, '[' ) === false;
+		// wp_update_post() can modify post tag. Code below sends tags by IDs to prevent this.
+		// wpmlcore-5947
+		// https://core.trac.wordpress.org/ticket/45121
+		$tag_ids = wp_get_post_tags( $post->ID, array( 'fields' => 'ids' ) );
+		$postarr = array(
+			'ID'           => $post->ID,
+			'post_content' => $post->post_content,
+			'tags_input'   => $tag_ids,
+		);
+		wp_update_post( $postarr );
 	}
 }

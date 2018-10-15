@@ -11,20 +11,6 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 	/**
 	 * @test
 	 */
-	public function it_should_not_translate_if_content_has_no_shortcode() {
-		$post = $this->get_post( 'Some content with no shortcode' );
-
-		\WP_Mock::userFunction( 'wp_update_post', array(
-			'times' => 0,
-		));
-
-		$subject = $this->get_subject();
-		$subject->translate( $post );
-	}
-
-	/**
-	 * @test
-	 */
 	public function it_should_not_translate_if_post_is_source() {
 		$post = $this->get_post( '[shortcodeA]Hello[/shortcodeA]' );
 
@@ -43,6 +29,53 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 
 	/**
 	 * @test
+	 */
+	public function it_should_not_translate_if_post_has_NO_media_shortcodes() {
+		$target_lang = 'fr';
+		$source_lang = 'en';
+		$original_post_id   = self::ORIGINAL_POST_ID;
+		$original_content   = '[shortcodeA image="http://example.com/union-jack.jpg" /]';
+		$translated_content = '[shortcodeA image="http://example.com/drapeau-francais.jpg" /]';
+
+		$post = $this->get_post( $original_content );
+
+		\WP_Mock::userFunction(
+			'wp_get_post_tags',
+			array(
+				'times' => 0,
+			)
+		);
+
+		\WP_Mock::userFunction(
+			'wp_update_post',
+			array(
+				'times' => 0,
+			)
+		);
+
+		$source_element = $this->get_element( $source_lang, null );
+		$source_element->method( 'get_id' )->willReturn( $original_post_id );
+
+		$element = $this->get_element( $target_lang, $source_lang );
+		$element->method( 'get_source_element' )->willReturn( $source_element );
+
+		$factory = $this->get_element_factory();
+		$factory->method( 'create_post' )->with( $post->ID )->willReturn( $element );
+
+		$media_shortcodes = $this->getMockBuilder( 'WPML_Page_Builders_Media_Shortcodes' )
+		                   ->setMethods( array( 'set_target_lang', 'set_source_lang', 'translate', 'has_media_shortcode' ) )
+		                   ->disableOriginalConstructor()->getMock();
+		$media_shortcodes->method( 'has_media_shortcode' )->willReturn( false );
+		$media_shortcodes->method( 'set_target_lang' )->with( $target_lang )->willReturnSelf();
+		$media_shortcodes->method( 'set_source_lang' )->with( $source_lang )->willReturnSelf();
+		$media_shortcodes->method( 'translate' )->with( $original_content )->willReturn( $translated_content );
+
+		$subject = $this->get_subject( $factory, $media_shortcodes );
+		$subject->translate( $post );
+	}
+
+	/**
+	 * @test
 	 * @group wpmlcore-5834
 	 */
 	public function it_should_translate() {
@@ -53,6 +86,14 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 		$translated_content = '[shortcodeA image="http://example.com/drapeau-francais.jpg" /]';
 
 		$post = $this->get_post( $original_content );
+
+		\WP_Mock::userFunction(
+			'wp_get_post_tags',
+			array(
+				'times'  => 1,
+				'return' => array( 1 ),
+			)
+		);
 
 		\WP_Mock::userFunction( 'wp_update_post', array(
 			'times' => 1,

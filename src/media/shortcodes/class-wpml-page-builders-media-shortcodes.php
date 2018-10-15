@@ -50,6 +50,10 @@ class WPML_Page_Builders_Media_Shortcodes {
 	 * @return bool
 	 */
 	public function has_media_shortcode( $content ) {
+		if ( false === strpos( $content, '[' ) ) {
+			return false;
+		};
+
 		foreach ( $this->config as $shortcode ) {
 			$shortcode = $this->sanitize_shortcode( $shortcode );
 			$tag_name  = isset( $shortcode['tag']['name'] ) ? $shortcode['tag']['name'] : '';
