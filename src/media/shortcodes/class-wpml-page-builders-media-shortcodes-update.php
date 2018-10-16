@@ -29,6 +29,10 @@ class WPML_Page_Builders_Media_Shortcodes_Update implements IWPML_PB_Media_Updat
 			return;
 		}
 
+		if ( ! $this->media_shortcodes->has_media_shortcode( $post->post_content ) ) {
+			return;
+		}
+
 		$element = $this->element_factory->create_post( $post->ID );
 
 		if ( ! $element->get_source_language_code() ) {

@@ -104,9 +104,12 @@ class Test_WPML_Page_Builders_Media_Shortcodes_Update extends \OTGS\PHPUnit\Tool
 	}
 
 	private function get_media_shortcodes() {
-		return $this->getMockBuilder( 'WPML_Page_Builders_Media_Shortcodes' )
-		            ->setMethods( array( 'set_target_lang', 'set_source_lang', 'translate' ) )
+		$shortcodes = $this->getMockBuilder( 'WPML_Page_Builders_Media_Shortcodes' )
+		            ->setMethods( array( 'set_target_lang', 'set_source_lang', 'translate', 'has_media_shortcode' ) )
 		            ->disableOriginalConstructor()->getMock();
+		$shortcodes->method( 'has_media_shortcode' )->willReturn( true );
+
+		return $shortcodes;
 	}
 
 	private function get_pb_media_usage() {

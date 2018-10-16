@@ -45,6 +45,24 @@ class WPML_Page_Builders_Media_Shortcodes {
 	}
 
 	/**
+	 * @param string $content
+	 *
+	 * @return bool
+	 */
+	public function has_media_shortcode( $content ) {
+		foreach ( $this->config as $shortcode ) {
+			$shortcode = $this->sanitize_shortcode( $shortcode );
+			$tag_name  = isset( $shortcode['tag']['name'] ) ? $shortcode['tag']['name'] : '';
+
+			if ( $tag_name && false !== strpos( $content, '[' . $tag_name ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * @param array $shortcode
 	 *
 	 * @return array
