@@ -11,6 +11,7 @@ class WPML_PB_Integration {
 	private $factory;
 	private $new_translations_recieved = false;
 	private $save_post_queue = array();
+	private $is_registering_string = false;
 
 	private $strategies = array();
 
@@ -68,9 +69,11 @@ class WPML_PB_Integration {
 	 */
 	public function register_all_strings_for_translation( $post ) {
 		if ( $this->is_post_status_ok( $post ) && $this->is_original_post( $post ) ) {
+			$this->is_registering_string = true;
 			foreach ( $this->strategies as $strategy ) {
 				$strategy->register_strings( $post );
 			}
+			$this->is_registering_string = false;
 		}
 	}
 
@@ -121,18 +124,18 @@ class WPML_PB_Integration {
 	public function do_shutdown_action() {
 		$this->save_translations_to_post();
 
-		remove_action( 'icl_st_add_string_translation', array( $this, 'new_translation' ), 10, 1 );
-
 		foreach( $this->save_post_queue as $post_id => $post ) {
 			$this->register_all_strings_for_translation( $post );
 		}
 	}
 
 	public function new_translation( $translated_string_id ) {
-		foreach ( $this->strategies as $strategy ) {
-			$this->factory->get_string_translations( $strategy )->new_translation( $translated_string_id );
+		if ( ! $this->is_registering_string ) {
+			foreach ( $this->strategies as $strategy ) {
+				$this->factory->get_string_translations( $strategy )->new_translation( $translated_string_id );
+			}
+			$this->new_translations_recieved = true;
 		}
-		$this->new_translations_recieved = true;
 	}
 
 	public function save_translations_to_post() {
