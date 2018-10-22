@@ -116,6 +116,47 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 	}
 
 	/**
+	 * @test
+	 * @group wpmlcore-5872
+	 */
+	public function it_should_register_all_strings_without_adding_new_translation() {
+		$original_post = $this->get_post();
+
+		$sitepress_mock = $this->get_sitepress_mock( $original_post->ID );
+		$factory_mock = $this->getMockBuilder( 'WPML_PB_Factory' )
+		                     ->setMethods( array( 'get_string_translations' ) )
+		                     ->disableOriginalConstructor()
+		                     ->getMock();
+		$factory_mock->expects( $this->never() )->method( 'get_string_translations' );
+
+		$strategy = $this->getMockBuilder( 'WPML_PB_Shortcode_Strategy' )
+		                 ->setMethods( array( ) )
+		                 ->disableOriginalConstructor()->getMock();
+
+		$pb_integration = new WPML_PB_Integration( $sitepress_mock, $factory_mock );
+
+		$pb_integration->add_strategy( $strategy );
+
+		$strategy->method( 'register_strings' )
+		         ->with( $original_post )
+		         ->willReturnCallback( function() use ( $pb_integration ) {
+			         $pb_integration->new_translation( mt_rand( 1, 1000 ) );
+		         });
+
+		\WP_Mock::wpFunction( 'get_post', array(
+			'args'   => array( $original_post->ID ),
+			'return' => $original_post,
+		));
+
+		$job = (object) array(
+			'original_doc_id'     => $original_post->ID,
+			'element_type_prefix' => 'post',
+		);
+
+		$pb_integration->cleanup_strings_after_translation_completed( mt_rand( 1, 100 ), array(), $job );
+	}
+
+	/**
 	 * @dataProvider dp_do_shutdown_action
 	 * @group wpmlpb-160
 	 *
@@ -144,12 +185,6 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		$pb_integration->add_strategy( $strategy );
 		$pb_integration->queue_save_post_actions( $original_post->ID, $original_post );
 		$pb_integration->queue_save_post_actions( $translated_post->ID, $translated_post );
-
-		\WP_Mock::wpFunction( 'remove_action', array(
-				'times' => 1,
-				'args'  => array( 'icl_st_add_string_translation', array( $pb_integration, 'new_translation' ), 10, 1 ),
-			)
-		);
 
 		if ( $wpml_media_enabled ) {
 			$media_updater = $this->getMockBuilder( 'IWPML_PB_Media_Update' )
@@ -231,11 +266,6 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		$pb_integration->add_strategy( $strategy );
 		$pb_integration->resave_post_translation_in_shutdown( $original_element );
 		$pb_integration->resave_post_translation_in_shutdown( $translated_element );
-
-		\WP_Mock::wpFunction( 'remove_action', array(
-             'times' => 1,
-             'args'  => array( 'icl_st_add_string_translation', array( $pb_integration, 'new_translation' ), 10, 1 ),
-         ));
 
 		if ( $wpml_media_enabled ) {
 			$media_updater = $this->getMockBuilder( 'IWPML_PB_Media_Update' )
@@ -322,11 +352,6 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		$pb_integration->add_strategy( $strategy );
 		$pb_integration->resave_post_translation_in_shutdown( $original_element );
 		$pb_integration->resave_post_translation_in_shutdown( $translated_element );
-
-		\WP_Mock::wpFunction( 'remove_action', array(
-             'times' => 1,
-             'args'  => array( 'icl_st_add_string_translation', array( $pb_integration, 'new_translation' ), 10, 1 ),
-         ));
 
 		if ( $wpml_media_enabled ) {
 			$media_updater = $this->getMockBuilder( 'IWPML_PB_Media_Update' )
