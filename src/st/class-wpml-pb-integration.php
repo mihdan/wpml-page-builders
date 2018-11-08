@@ -228,7 +228,13 @@ class WPML_PB_Integration {
 	 */
 	private function post_has_strings( $post_id ) {
 		$wpdb = $this->sitepress->get_wpdb();
-		$string_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(ID) FROM {$wpdb->prefix}icl_string_packages WHERE post_id = %d", $post_id) );
+		$string_packages_table = $wpdb->prefix . 'icl_string_packages';
+
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$string_packages_table'" ) !== $string_packages_table ) {
+			return false;
+		}
+
+		$string_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(ID) FROM {$string_packages_table} WHERE post_id = %d", $post_id) );
 		return $string_count > 0;
 	}
 

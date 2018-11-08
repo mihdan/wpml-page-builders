@@ -422,10 +422,23 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 	public function test_migrate_location_no_strings() {
 		$post_id = mt_rand();
 
-		$wpdb         = \Mockery::mock( 'wpdb' );
-		$wpdb->prefix = rand_str();
-		$wpdb->shouldReceive( 'prepare' )->with( "SELECT COUNT(ID) FROM {$wpdb->prefix}icl_string_packages WHERE post_id = %d", $post_id )->andReturn( 'prepared' );
-		$wpdb->shouldReceive( 'get_var' )->with( 'prepared' )->andReturn( 0 );
+		$wpdb = $this->getMockBuilder( 'wpdb' )
+		             ->setMethods( array( 'prepare', 'get_var' ) )
+		             ->disableOriginalConstructor()
+		             ->getMock();
+
+		$wpdb->prefix          = rand_str();
+		$string_packages_table = $wpdb->prefix . 'icl_string_packages';
+		$wpdb->method( 'prepare' )
+		     ->with( 'SELECT COUNT(ID) FROM ' . $string_packages_table . ' WHERE post_id = %d', $post_id )
+		     ->willReturn( 'prepared' );
+
+		$wpdb->method( 'get_var' )
+		     ->withConsecutive(
+			     array( "SHOW TABLES LIKE '" . $string_packages_table . "'" ),
+			     array( 'prepared' )
+		     )
+		     ->willReturnOnConsecutiveCalls( $string_packages_table, 0 );
 
 		$sitepress_mock = \Mockery::mock( 'SitePress' );
 		$sitepress_mock->shouldReceive( 'get_wpdb' )->andReturn( $wpdb );
@@ -443,16 +456,69 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 
 	/**
 	 * @group page-builders
+	 * @group wpmlcore-6021
+	 * @group migrate-location
+	 */
+	public function it_should_not_migrate_if_string_packages_table_is_not_present() {
+		$post_id = mt_rand();
+
+		$wpdb = $this->getMockBuilder( 'wpdb' )
+		             ->setMethods( array( 'prepare', 'get_var' ) )
+		             ->disableOriginalConstructor()
+		             ->getMock();
+
+		$wpdb->prefix          = rand_str();
+		$string_packages_table = $wpdb->prefix . 'icl_string_packages';
+
+		$wpdb->expects( $this->once() )
+			->method( 'get_var' )
+			->with( "SHOW TABLES LIKE '" . $string_packages_table . "'" )
+			->willReturn( false );
+
+		$sitepress_mock = \Mockery::mock( 'SitePress' );
+		$sitepress_mock->shouldReceive( 'get_wpdb' )->andReturn( $wpdb );
+
+		$factory_mock = $this->get_factory( null, $sitepress_mock );
+
+		\WP_Mock::wpFunction( 'get_post_meta', array(
+			'times'  => 0,
+			'args'   => array( $post_id, WPML_PB_Integration::MIGRATION_DONE_POST_META, true ),
+			'return' => true,
+		) );
+
+		\WP_Mock::wpFunction( 'update_post_meta', array(
+			'times' => 0,
+			'args'  => array( $post_id, WPML_PB_Integration::MIGRATION_DONE_POST_META, true ),
+		) );
+
+		$subject = new WPML_PB_Integration( $sitepress_mock, $factory_mock );
+		$subject->migrate_location( $post_id, new stdClass() );
+	}
+
+	/**
+	 * @group page-builders
 	 * @group wpmlst-1171
 	 * @group migrate-location
 	 */
 	public function test_migrate_location_already_done() {
 		$post_id = mt_rand();
 
-		$wpdb         = \Mockery::mock( 'wpdb' );
-		$wpdb->prefix = rand_str();
-		$wpdb->shouldReceive( 'prepare' )->with( "SELECT COUNT(ID) FROM {$wpdb->prefix}icl_string_packages WHERE post_id = %d", $post_id )->andReturn( 'prepared' );
-		$wpdb->shouldReceive( 'get_var' )->with( 'prepared' )->andReturn( 1 );
+		$wpdb = $this->getMockBuilder( 'wpdb' )
+		             ->setMethods( array( 'prepare', 'get_var' ) )
+		             ->disableOriginalConstructor()
+		             ->getMock();
+
+		$wpdb->prefix          = rand_str();
+		$string_packages_table = $wpdb->prefix . 'icl_string_packages';
+
+		$wpdb->method( 'prepare' )->with( "SELECT COUNT(ID) FROM {$wpdb->prefix}icl_string_packages WHERE post_id = %d", $post_id )->willReturn( 'prepared' );
+
+		$wpdb->method( 'get_var' )
+		     ->withConsecutive(
+			     array( "SHOW TABLES LIKE '" . $string_packages_table . "'" ),
+			     array( 'prepared' )
+		     )
+		     ->willReturnOnConsecutiveCalls( $string_packages_table, 1 );
 
 		$sitepress_mock = \Mockery::mock( 'SitePress' );
 		$sitepress_mock->shouldReceive( 'get_wpdb' )->andReturn( $wpdb );
@@ -489,9 +555,15 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 
 		$wpdb         = \Mockery::mock( 'wpdb' );
 		$wpdb->prefix = rand_str();
+
+		$string_packages_table = $wpdb->prefix . 'icl_string_packages';
+
 		$wpdb->shouldReceive( 'prepare' )
 		     ->with( "SELECT COUNT(ID) FROM {$wpdb->prefix}icl_string_packages WHERE post_id = %d", $post->ID )
 		     ->andReturn( 'prepared' );
+
+		$wpdb->shouldReceive( 'get_var' )->with( "SHOW TABLES LIKE '" . $string_packages_table . "'" )->andReturn( $string_packages_table );
+
 		$wpdb->shouldReceive( 'get_var' )->with( 'prepared' )->andReturn( 1 );
 		$wpdb->posts = 'posts';
 		$wpdb->shouldReceive( 'prepare' )
