@@ -5,8 +5,9 @@ checks:
         duplication: true
 filter:
     excluded_paths:
-    - "tests/"
-    - "vendor/"
+        - "tests/"
+    dependency_paths:
+        - "vendor/"
 coding_style:
     php:
         indentation:
@@ -23,13 +24,13 @@ build:
         - vendor/
     nodes:
 
-        php-coding-standards:
+        analysis:
             environment:
                 php: 7.1
             tests:
                 override:
                 - idle_timeout: 4800
-                  command: "phpcs-run ./"
+                  command: php-scrutinizer-run
 
         phpunit:
             environment:
