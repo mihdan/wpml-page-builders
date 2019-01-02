@@ -14,6 +14,7 @@ class Test_WPML_Page_Builders_Defined extends WPML_PB_TestCase2 {
 			'beaver-builder' => array(
 				'name'            => 'Beaver Builder',
 				'constant'        => 'FL_BUILDER_VERSION',
+				'function'        => null,
 				'notices-display' => array(
 					'wpml-translation-editor',
 				),
@@ -21,6 +22,7 @@ class Test_WPML_Page_Builders_Defined extends WPML_PB_TestCase2 {
 			'elementor'      => array(
 				'name'            => 'Elementor',
 				'constant'        => 'ELEMENTOR_VERSION',
+				'function'        => null,
 				'notices-display' => array(
 					'wpml-translation-editor',
 				),
@@ -28,6 +30,15 @@ class Test_WPML_Page_Builders_Defined extends WPML_PB_TestCase2 {
 			'gutenberg'      => array(
 				'name'            => 'Gutenberg',
 				'constant'        => 'GUTENBERG_VERSION',
+				'function'        => null,
+				'notices-display' => array(
+					'wpml-translation-editor',
+				),
+			),
+			'cornerstone'      => array(
+				'name'            => 'Cornerstone',
+				'constant'        => null,
+				'function'        => 'cornerstone_plugin_init',
 				'notices-display' => array(
 					'wpml-translation-editor',
 				),
@@ -56,6 +67,10 @@ class Test_WPML_Page_Builders_Defined extends WPML_PB_TestCase2 {
 			'gutenberg'      => array(
 				'constant' => 'GUTENBERG_VERSION',
 				'factory'  => 'WPML_Gutenberg_Integration_Factory',
+			),
+			'cornerstone'    => array(
+				'function' => 'cornerstone_plugin_init',
+				'factory'  => 'WPML_Cornerstone_Integration_Factory',
 			),
 		);
 

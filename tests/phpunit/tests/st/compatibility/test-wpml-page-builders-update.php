@@ -34,7 +34,7 @@ class Test_WPML_Page_Builders_Update extends \OTGS\PHPUnit\Tools\TestCase {
 		$converted_data = array( 'converted data' );
 		$prepared_data  = array( 'prepared data' );
 		$fields_to_save = array( 'the-meta-field-key-1', 'the-meta-field-key-2' );
-		$fields_to_copy = array( 'the-field-to-copy-1', 'the-field-to-copy-2' );
+		$fields_to_copy = array( 'the-field-to-copy-1', 'the-field-to-copy-2', 'post_content' );
 
 		foreach ( $fields_to_save as $field_to_save ) {
 			\WP_Mock::userFunction( 'update_post_meta', array(
@@ -44,6 +44,31 @@ class Test_WPML_Page_Builders_Update extends \OTGS\PHPUnit\Tools\TestCase {
 		}
 
 		foreach ( $fields_to_copy as $field_to_copy ) {
+			if ( 'post_content' === $field_to_copy ) {
+				$original_post = $this->getMockBuilder( 'WP_Post' )
+				                      ->disableOriginalConstructor()
+				                      ->getMock();
+
+				$original_post->post_content = 'the_content';
+
+				\WP_Mock::userFunction( 'get_post', array(
+					'args' => $original_post_id,
+					'return' => $original_post,
+				));
+
+				\WP_Mock::userFunction( 'wp_update_post', array(
+					'args' => array(
+						array(
+							'ID' => $post_id,
+							'post_content' => $original_post->post_content,
+						)
+					),
+					'times' => 1,
+				));
+
+				continue;
+			}
+
 			$field_value = 'value of ' . $field_to_copy;
 			$filterd_value = 'filtered ' . $field_value;
 
