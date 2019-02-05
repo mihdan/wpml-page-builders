@@ -1,39 +1,34 @@
 <?php
 
-class WPML_PB_Reuse_Translations {
+class WPML_PB_Reuse_translations {
 
-	/** @var  IWPML_PB_Strategy $strategy */
-	private $strategy;
 	/** @var WPML_ST_String_Factory $string_factory */
 	private $string_factory;
 
 	/** @var  array $original_strings */
 	private $original_strings;
+
 	/** @var  array $current_strings */
 	private $current_strings;
 
-	public function __construct( IWPML_PB_Strategy $strategy, WPML_ST_String_Factory $string_factory ) {
-		$this->strategy       = $strategy;
+	public function __construct( WPML_ST_String_Factory $string_factory ) {
 		$this->string_factory = $string_factory;
 	}
 
-	/** @param string[] $strings */
-	public function set_original_strings( array $strings ) {
-		$this->original_strings = $strings;
-	}
-
 	/**
-	 * @param int $post_id
-	 * @param string[] $leftover_strings
+	 * @param stdClass[] $original_strings
+	 * @param stdClass[] $current_strings
+	 * @param stdClass[] $leftover_strings
 	 */
-	public function find_and_reuse( $post_id, array $leftover_strings ) {
-		$this->current_strings = $this->strategy->get_package_strings( $this->strategy->get_package_key( $post_id ) );
-
-		$new_strings           = $this->find_new_strings();
-		$new_strings_to_update = $this->find_existing_strings_for_new_strings( $new_strings, $leftover_strings );
+	public function find_and_reuse_translations( array $original_strings, array $current_strings, array $leftover_strings ) {
+		$this->original_strings = $original_strings;
+		$this->current_strings  = $current_strings;
+		$new_strings            = $this->find_new_strings();
+		$new_strings_to_update  = $this->find_existing_strings_for_new_strings( $new_strings, $leftover_strings );
 		$this->reuse_translations( $new_strings_to_update );
 	}
 
+	/** @return array */
 	private function find_new_strings() {
 		$new_strings = array();
 
@@ -54,7 +49,7 @@ class WPML_PB_Reuse_Translations {
 	}
 
 	/**
-	 * @param int[] $new_strings
+	 * @param int[]    $new_strings
 	 * @param string[] $leftover_strings
 	 *
 	 * @return int[]
@@ -68,7 +63,7 @@ class WPML_PB_Reuse_Translations {
 	}
 
 	/**
-	 * @param int[] $new_strings
+	 * @param int[]    $new_strings
 	 * @param string[] $leftover_strings
 	 *
 	 * @return array
@@ -86,8 +81,7 @@ class WPML_PB_Reuse_Translations {
 			foreach ( $this->current_strings as $current_string ) {
 				if ( isset( $new_strings[ $current_string['id'] ] ) ) {
 					if ( $this->is_same_location_and_different_ids( $current_string, $leftover_string )
-						 && $this->is_similar_text( $leftover_string['value'], $current_string['value'] )
-					) {
+					     && $this->is_similar_text( $leftover_string['value'], $current_string['value'] ) ) {
 						$new_strings[ $current_string['id'] ] = $leftover_string['id'];
 						unset( $leftover_strings[ $key ] );
 					}
@@ -99,7 +93,7 @@ class WPML_PB_Reuse_Translations {
 	}
 
 	/**
-	 * @param int[] $new_strings
+	 * @param int[]    $new_strings
 	 * @param string[] $leftover_strings
 	 *
 	 * @return int[]
@@ -135,7 +129,9 @@ class WPML_PB_Reuse_Translations {
 	 * @return bool
 	 */
 	private function is_same_location_and_different_ids( array $current_string, array $leftover_string ) {
-		return $current_string['location'] == $leftover_string['location'] && $current_string['id'] != $leftover_string['id'];
+		return $current_string['location'] == $leftover_string['location']
+		       && $current_string['id']
+		          != $leftover_string['id'];
 	}
 
 	/**
@@ -161,17 +157,14 @@ class WPML_PB_Reuse_Translations {
 
 				foreach ( $translations as $translation ) {
 					$status = $translation->status == ICL_TM_COMPLETE ? ICL_TM_NEEDS_UPDATE : $translation->status;
-					$new_string->set_translation(
-						$translation->language,
-						$translation->value,
-						$status,
-						$translation->translator_id,
-						$translation->translation_service,
-						$translation->batch_id
-					);
+					$new_string->set_translation( $translation->language,
+					                              $translation->value,
+					                              $status,
+					                              $translation->translator_id,
+					                              $translation->translation_service,
+					                              $translation->batch_id );
 				}
 			}
 		}
 	}
-
 }

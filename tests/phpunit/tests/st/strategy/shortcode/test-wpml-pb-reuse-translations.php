@@ -89,7 +89,7 @@ class Test_WPML_PB_Reuse_Translations extends WPML_PB_TestCase {
 		                         ->with( $string_id_old_content )
 		                         ->andReturn( $string_old_content );
 
-		$subject = new WPML_PB_Reuse_Translations( $strategy_mock, $string_registration_mock );
+		$subject = new WPML_PB_Reuse_Translations_By_Strategy( $strategy_mock, $string_registration_mock );
 
 		$subject->set_original_strings( $original_strings );
 		$subject->find_and_reuse( $post_id, $leftover_strings );
@@ -160,7 +160,7 @@ class Test_WPML_PB_Reuse_Translations extends WPML_PB_TestCase {
 		                         ->with( $string_id_updated )
 		                         ->andReturn( $string_updated );
 
-		$subject = new WPML_PB_Reuse_Translations( $strategy_mock, $string_registration_mock );
+		$subject = new WPML_PB_Reuse_Translations_By_Strategy( $strategy_mock, $string_registration_mock );
 
 		$subject->set_original_strings( $original_strings );
 

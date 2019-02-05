@@ -73,7 +73,7 @@ class Test_WPML_PB_Register_Shortcodes extends WPML_PB_TestCase {
 		$factory  = $this->get_factory( $wpdb, $sitepress_mock );
 		$strategy = $this->get_shortcode_strategy( $factory, $encode ? WPML_PB_Shortcode_Encoding::ENCODE_TYPES_BASE64 : '' );
 
-		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations' );
+		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations_By_Strategy' );
 		$reuse_translations_mock->shouldReceive( 'set_original_strings' );
 		$reuse_translations_mock->shouldReceive( 'find_and_reuse' );
 
@@ -119,7 +119,7 @@ class Test_WPML_PB_Register_Shortcodes extends WPML_PB_TestCase {
 			                    $this->equalTo( 'VISUAL' )
 		                    );
 
-		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations' );
+		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations_By_Strategy' );
 		$reuse_translations_mock->shouldReceive( 'set_original_strings' );
 		$reuse_translations_mock->shouldReceive( 'find_and_reuse' );
 
@@ -187,7 +187,7 @@ class Test_WPML_PB_Register_Shortcodes extends WPML_PB_TestCase {
 		$strategy->method( 'get_shortcode_attribute_encoding' )->willReturn( WPML_PB_Shortcode_Encoding::ENCODE_TYPES_BASE64 );
 		$strategy->expects( $this->once() )->method( 'remove_string' )->with( $string_data['dummy_data'] );
 
-		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations' );
+		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations_By_Strategy' );
 		$reuse_translations_mock->shouldReceive( 'set_original_strings' );
 		$reuse_translations_mock->shouldReceive( 'find_and_reuse' );
 
@@ -211,7 +211,7 @@ class Test_WPML_PB_Register_Shortcodes extends WPML_PB_TestCase {
 		$strategy_mock->shouldReceive( 'get_package_strings' )->andReturn( $strings );
 		$strategy_mock->shouldReceive( 'remove_string' );
 
-		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations' );
+		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations_By_Strategy' );
 		$reuse_translations_mock->shouldReceive( 'set_original_strings' )->once()->with( $strings );
 		$reuse_translations_mock->shouldReceive( 'find_and_reuse' )->once()->with( $post_id, $strings );
 

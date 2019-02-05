@@ -30,7 +30,7 @@ class Test_WPML_PB_Factory extends WPML_PB_TestCase {
 	public function test_get_string_translations() {
 		$factory            = $this->get_factory_with_mocks();
 		$string_translation = $factory->get_string_translations( $this->get_shortcode_strategy( $factory ) );
-		$this->assertInstanceOf( 'WPML_PB_String_Translation', $string_translation );
+		$this->assertInstanceOf( 'WPML_PB_String_Translation_By_Strategy', $string_translation );
 	}
 
 	/**

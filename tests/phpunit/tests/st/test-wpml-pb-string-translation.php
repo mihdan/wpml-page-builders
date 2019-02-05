@@ -26,7 +26,7 @@ class Test_WPML_PB_String_Translation extends WPML_PB_TestCase {
 
 		$wpdb_mock = $this->get_wpdb_mock( $string_package_id, $language_1, $language_2 );
 
-		$pb_string_translation = new WPML_PB_String_Translation( $wpdb_mock, $factory_mock, $strategy_mock );
+		$pb_string_translation = new WPML_PB_String_Translation_By_Strategy( $wpdb_mock, $factory_mock, $strategy_mock );
 		$pb_string_translation->new_translation( $translated_string_id );
 		$pb_string_translation->new_translation( $translated_string_id );
 		$pb_string_translation->save_translations_to_post();
@@ -45,7 +45,7 @@ class Test_WPML_PB_String_Translation extends WPML_PB_TestCase {
 		list( $factory_mock, $strategy_mock, $package ) = $this->get_factory_and_strategy_mock( $string_package_id, $language_1, $language_2 );
 		$wpdb_mock = $this->get_wpdb_mock( $string_package_id, $language_1, $language_2 );
 
-		$pb_string_translation = new WPML_PB_String_Translation( $wpdb_mock, $factory_mock, $strategy_mock );
+		$pb_string_translation = new WPML_PB_String_Translation_By_Strategy( $wpdb_mock, $factory_mock, $strategy_mock );
 		$pb_string_translation->add_package_to_update_list( $package, $language_1 );
 		$pb_string_translation->add_package_to_update_list( $package, $language_2 );
 		$pb_string_translation->save_translations_to_post();
@@ -143,7 +143,7 @@ class Test_WPML_PB_String_Translation extends WPML_PB_TestCase {
 		$field_type = 'package-string-' . $string_package_id . '-' . $translated_string_id;
 		$wpdb->expects( $this->exactly( 2 ) )->method( 'get_var' )->willReturnOnConsecutiveCalls( $job_id, $job_translated );
 		$wpdb->expects( $this->exactly( $delete_count ) )->method( 'delete' )->with( $wpdb->prefix . 'icl_translate', array( 'field_type' => $field_type ), array( '%s' ) );
-		$pb_string_translation = new WPML_PB_String_Translation( $wpdb, $factory_mock, $strategy_mock );
+		$pb_string_translation = new WPML_PB_String_Translation_By_Strategy( $wpdb, $factory_mock, $strategy_mock );
 		$string_data = array(
 			'context'    => $context,
 			'name'       => $name,
@@ -183,7 +183,7 @@ class Test_WPML_PB_String_Translation extends WPML_PB_TestCase {
 		$field_type = 'package-string-' . $string_package_id . '-' . $translated_string_id;
 		$wpdb->expects( $this->exactly( 1 ) )->method( 'get_var' )->willReturn( $job_id );
 		$wpdb->expects( $this->exactly( 1 ) )->method( 'delete' )->with( $wpdb->prefix . 'icl_translate', array( 'field_type' => $field_type ), array( '%s' ) );
-		$pb_string_translation = new WPML_PB_String_Translation( $wpdb, $factory_mock, $strategy_mock );
+		$pb_string_translation = new WPML_PB_String_Translation_By_Strategy( $wpdb, $factory_mock, $strategy_mock );
 		$string_data = array(
 			'context'    => $context,
 			'name'       => $name,

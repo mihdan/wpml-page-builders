@@ -234,7 +234,7 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		$updated_package = $this->getMockBuilder( 'WPML_Package' )
 								->disableOriginalConstructor()->getMock();
 
-		$string_translation = $this->getMockBuilder( 'WPML_PB_String_Translation' )
+		$string_translation = $this->getMockBuilder( 'WPML_PB_String_Translation_By_Strategy' )
 		                           ->setMethods( array( 'save_translations_to_post', 'add_package_to_update_list' ) )
 		                           ->disableOriginalConstructor()
 		                           ->getMock();
@@ -326,7 +326,7 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 		$updated_package = $this->getMockBuilder( 'WPML_Package' )
 								->disableOriginalConstructor()->getMock();
 
-		$string_translation = $this->getMockBuilder( 'WPML_PB_String_Translation' )
+		$string_translation = $this->getMockBuilder( 'WPML_PB_String_Translation_By_Strategy' )
 		                           ->disableOriginalConstructor()
 		                           ->getMock();
 
@@ -799,7 +799,7 @@ class Test_WPML_PB_Integration extends WPML_PB_TestCase {
 	}
 
 	private function get_factory_mock_for_register_translations( $translated_string_id ) {
-		$string_translation_mock = $this->getMockBuilder( 'WPML_PB_String_Translation' )
+		$string_translation_mock = $this->getMockBuilder( 'WPML_PB_String_Translation_By_Strategy' )
 		                                ->setMethods( array( 'new_translation', 'save_translations_to_post' ) )
 		                                ->disableOriginalConstructor()
 		                                ->getMock();

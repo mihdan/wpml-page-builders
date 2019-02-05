@@ -71,7 +71,7 @@ class Test_WPML_PB_Visual_Composer_Links extends WPML_PB_TestCase {
 		$string_handler->shouldReceive( 'get_string_id_from_package' )->andReturn( 'anything' );
 		$string_handler->shouldReceive( 'get_string_title' )->andReturn( 'anything' );
 
-		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations' );
+		$reuse_translations_mock = Mockery::mock( 'WPML_PB_Reuse_Translations_By_Strategy' );
 		$reuse_translations_mock->shouldReceive( 'set_original_strings' );
 		$reuse_translations_mock->shouldReceive( 'find_and_reuse' );
 
