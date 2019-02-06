@@ -16,9 +16,9 @@ class WPML_PB_Reuse_Translations {
 	}
 
 	/**
-	 * @param array $original_strings
-	 * @param array $current_strings
-	 * @param array $leftover_strings
+	 * @param array[] $original_strings
+	 * @param array[] $current_strings
+	 * @param array[] $leftover_strings
 	 */
 	public function find_and_reuse_translations( array $original_strings, array $current_strings, array $leftover_strings ) {
 		$this->original_strings = $original_strings;
@@ -49,8 +49,8 @@ class WPML_PB_Reuse_Translations {
 	}
 
 	/**
-	 * @param int[] $new_strings
-	 * @param array $leftover_strings
+	 * @param int[]   $new_strings
+	 * @param array[] $leftover_strings
 	 *
 	 * @return int[]
 	 */
@@ -63,10 +63,10 @@ class WPML_PB_Reuse_Translations {
 	}
 
 	/**
-	 * @param int[] $new_strings
-	 * @param array $leftover_strings
+	 * @param int[]   $new_strings
+	 * @param array[] $leftover_strings
 	 *
-	 * @return array
+	 * @return array[]
 	 */
 	private function find_by_location( array $new_strings, array $leftover_strings ) {
 		if ( ! $leftover_strings ) {
@@ -93,8 +93,8 @@ class WPML_PB_Reuse_Translations {
 	}
 
 	/**
-	 * @param int[] $new_strings
-	 * @param array $leftover_strings
+	 * @param int[]   $new_strings
+	 * @param array[] $leftover_strings
 	 *
 	 * @return int[]
 	 */
@@ -162,7 +162,8 @@ class WPML_PB_Reuse_Translations {
 						$status,
 						$translation->translator_id,
 						$translation->translation_service,
-						$translation->batch_id );
+						$translation->batch_id
+					);
 				}
 			}
 		}

@@ -19,8 +19,8 @@ class WPML_PB_Register_Shortcodes {
 
 	/**
 	 * @param WPML_PB_String_Registration                 $handle_strings
-	 * @param WPML_PB_Shortcode_Strategy                  $shortcode_strategy ,
-	 * @param WPML_PB_Shortcode_Encoding                  $encoding           ,
+	 * @param WPML_PB_Shortcode_Strategy                  $shortcode_strategy
+	 * @param WPML_PB_Shortcode_Encoding                  $encoding
 	 * @param WPML_PB_Reuse_Translations_By_Strategy|null $reuse_translations
 	 */
 	public function __construct(
