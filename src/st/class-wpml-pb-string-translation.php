@@ -21,7 +21,8 @@ class WPML_PB_String_Translation {
 			$sql_to_get_strings_with_package_id = $this->wpdb->prepare( "SELECT *
 			FROM {$this->wpdb->prefix}icl_strings s
 			WHERE s.string_package_id=%d",
-			                                                            $package_id );
+			$package_id );
+
 			$package_strings = $this->wpdb->get_results( $sql_to_get_strings_with_package_id );
 
 			if ( ! empty( $package_strings ) ) {
@@ -78,8 +79,10 @@ class WPML_PB_String_Translation {
 		$sql_to_get_package_id = $this->wpdb->prepare( "SELECT s.ID
 		FROM {$this->wpdb->prefix}icl_string_packages s
 		WHERE s.kind=%s AND s.name=%s AND s.title=%s AND s.post_id=%s",
-		                                               $package_data['kind'], $package_data['name'], $package_data['title'], $package_data['post_id'] );
+		$package_data['kind'], $package_data['name'], $package_data['title'], $package_data['post_id'] );
+
 		$result = $this->wpdb->get_row( $sql_to_get_package_id );
+
 		if ( $result ) {
 			$package_id = $result->ID;
 		}

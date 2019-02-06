@@ -1,6 +1,6 @@
 <?php
 
-class WPML_PB_Reuse_translations {
+class WPML_PB_Reuse_Translations {
 
 	/** @var WPML_ST_String_Factory $string_factory */
 	private $string_factory;
@@ -16,9 +16,9 @@ class WPML_PB_Reuse_translations {
 	}
 
 	/**
-	 * @param stdClass[] $original_strings
-	 * @param stdClass[] $current_strings
-	 * @param stdClass[] $leftover_strings
+	 * @param array $original_strings
+	 * @param array $current_strings
+	 * @param array $leftover_strings
 	 */
 	public function find_and_reuse_translations( array $original_strings, array $current_strings, array $leftover_strings ) {
 		$this->original_strings = $original_strings;
@@ -49,8 +49,8 @@ class WPML_PB_Reuse_translations {
 	}
 
 	/**
-	 * @param int[]    $new_strings
-	 * @param string[] $leftover_strings
+	 * @param int[] $new_strings
+	 * @param array $leftover_strings
 	 *
 	 * @return int[]
 	 */
@@ -63,8 +63,8 @@ class WPML_PB_Reuse_translations {
 	}
 
 	/**
-	 * @param int[]    $new_strings
-	 * @param string[] $leftover_strings
+	 * @param int[] $new_strings
+	 * @param array $leftover_strings
 	 *
 	 * @return array
 	 */
@@ -93,8 +93,8 @@ class WPML_PB_Reuse_translations {
 	}
 
 	/**
-	 * @param int[]    $new_strings
-	 * @param string[] $leftover_strings
+	 * @param int[] $new_strings
+	 * @param array $leftover_strings
 	 *
 	 * @return int[]
 	 */
@@ -129,9 +129,8 @@ class WPML_PB_Reuse_translations {
 	 * @return bool
 	 */
 	private function is_same_location_and_different_ids( array $current_string, array $leftover_string ) {
-		return $current_string['location'] == $leftover_string['location']
-		       && $current_string['id']
-		          != $leftover_string['id'];
+		return $current_string['location'] === $leftover_string['location']
+		       && $current_string['id'] !== $leftover_string['id'];
 	}
 
 	/**
@@ -157,12 +156,13 @@ class WPML_PB_Reuse_translations {
 
 				foreach ( $translations as $translation ) {
 					$status = $translation->status == ICL_TM_COMPLETE ? ICL_TM_NEEDS_UPDATE : $translation->status;
-					$new_string->set_translation( $translation->language,
-					                              $translation->value,
-					                              $status,
-					                              $translation->translator_id,
-					                              $translation->translation_service,
-					                              $translation->batch_id );
+					$new_string->set_translation(
+						$translation->language,
+						$translation->value,
+						$status,
+						$translation->translator_id,
+						$translation->translation_service,
+						$translation->batch_id );
 				}
 			}
 		}

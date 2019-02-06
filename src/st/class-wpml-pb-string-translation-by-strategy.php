@@ -2,20 +2,22 @@
 
 class WPML_PB_String_Translation_By_Strategy extends WPML_PB_String_Translation {
 
-	/** @var  WPML_PB_Factory $factory */
+	/** @var WPML_PB_Factory $factory */
 	private $factory;
-	/** @var  WPML_PB_Shortcode_Strategy $strategy */
+
+	/** @var IWPML_PB_Strategy $strategy */
 	private $strategy;
 
 	/** @var array $packages_to_update */
 	private $packages_to_update = array();
 
 	public function __construct( wpdb $wpdb, WPML_PB_Factory $factory, IWPML_PB_Strategy $strategy ) {
-		$this->factory = $factory;
+		$this->factory  = $factory;
 		$this->strategy = $strategy;
 		parent::__construct( $wpdb );
 	}
 
+	/** @param int $translated_string_id */
 	public function new_translation( $translated_string_id ) {
 		list( $package_id, $string_id, $language ) = $this->get_package_for_translated_string( $translated_string_id );
 		if ( $package_id ) {
@@ -35,6 +37,11 @@ class WPML_PB_String_Translation_By_Strategy extends WPML_PB_String_Translation 
 		}
 	}
 
+	/**
+	 * @param int $translated_string_id
+	 *
+	 * @return array
+	 */
 	private function get_package_for_translated_string( $translated_string_id ) {
 		$sql    = $this->wpdb->prepare(
 			"SELECT s.string_package_id, s.id, t.language
