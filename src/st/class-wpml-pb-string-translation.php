@@ -27,7 +27,7 @@ class WPML_PB_String_Translation {
 
 			if ( ! empty( $package_strings ) ) {
 				foreach ( $package_strings as $string ) {
-					$strings[ md5( $string->value ) ] = array(
+					$strings[ $this->get_string_hash( $string->value ) ] = array(
 						'value'      => $string->value,
 						'context'    => $string->context,
 						'name'       => $string->name,
@@ -88,5 +88,14 @@ class WPML_PB_String_Translation {
 		}
 
 		return $package_id;
+	}
+
+	/**
+	 * @param string $string_value
+	 *
+	 * @return string
+	 */
+	public function get_string_hash( $string_value ) {
+		return md5( $string_value );
 	}
 }
